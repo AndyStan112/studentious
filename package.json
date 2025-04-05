@@ -19,6 +19,7 @@
         "@mui/icons-material": "^7.0.1",
         "@mui/material": "^7.0.1",
         "@prisma/client": "^6.5.0",
+        "@vercel/blob": "^0.27.3",
         "ably": "^2.6.5",
         "axios": "^1.8.4",
         "emotion": "^11.0.0",
