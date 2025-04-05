@@ -20,7 +20,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface NavbarProps {
     title?: string;
@@ -51,13 +51,13 @@ const Navbar: React.FC<NavbarProps> = ({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [drawerOpen, setDrawerOpen] = useState(false);
-
+    const pathname = usePathname();
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
 
     const isActive = (path: string) => {
-        return usePathname() === path;
+        return pathname === path;
     };
 
     const drawer = (
