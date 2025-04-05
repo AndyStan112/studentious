@@ -1,6 +1,15 @@
-import { prisma } from "@/utils";
+"use client";
+
 import { notFound } from "next/navigation";
 import { Container, Typography, Box, Chip, Grid } from "@mui/material";
+import dynamic from "next/dynamic";
+import { getEventById } from "./actions";
+import React from "react";
+
+const EventMap = dynamic(() => import("@/components/EventMap"), {
+    ssr: false,
+    loading: () => <p>Loading map...</p>,
+});
 
 interface PageProps {
     params: {
@@ -8,23 +17,19 @@ interface PageProps {
     };
 }
 
-export default async function EventDetailPage({ params }: PageProps) {
-    const res = await params;
-    const eventId = res.id;
+export default function EventDetailPage({ params }: PageProps) {
+    const [event, setEvent] = React.useState(null);
 
-    const event = await prisma.event.findUnique({
-        where: { id: eventId },
-        include: {
-            organizer: true,
-            registrations: true,
-        },
+    const param = React.use(params);
+
+    React.useEffect(() => {
+        getEventById(param.id).then((event1) => {
+            console.log(event);
+            setEvent(event1);
+        });
     });
 
-    if (!event) {
-        notFound();
-    }
-
-    return (
+    return event ? (
         <Container sx={{ mt: 4 }}>
             <Box display="flex" justifyContent="center">
                 <Box display="flex" gap="100px" maxWidth="md">
@@ -50,11 +55,12 @@ export default async function EventDetailPage({ params }: PageProps) {
                                 Tags:
                             </Typography>
                             <Grid container spacing={1}>
-                                {event.tags.map((tag: string, index: number) => (
-                                    <Grid item key={index}>
-                                        <Chip label={tag} />
-                                    </Grid>
-                                ))}
+                                {event.tags &&
+                                    event.tags.map((tag: string, index: number) => (
+                                        <Grid item key={index}>
+                                            <Chip label={tag} />
+                                        </Grid>
+                                    ))}
                             </Grid>
                         </Box>
                         <Box sx={{ my: 2 }}>
@@ -67,6 +73,31 @@ export default async function EventDetailPage({ params }: PageProps) {
                                 Registrations: {event.registrations.length}
                             </Typography>
                         </Box>
+
+                        {event.url ? (
+                            <Box sx={{ my: 2 }}>
+                                <Typography variant="subtitle1">
+                                    Online Event URL:{" "}
+                                    <a
+                                        href={event.url!}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ wordBreak: "break-all" }}
+                                    >
+                                        {event.url}
+                                    </a>
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ my: 2 }}>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    Event Location:
+                                </Typography>
+                                <Box sx={{ height: 400, width: "100%" }}>
+                                    <EventMap lat={event.lat!} long={event.long!} />
+                                </Box>
+                            </Box>
+                        )}
                     </Box>
                     <Box
                         sx={{
@@ -91,6 +122,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                 </Box>
             </Box>
         </Container>
+    ) : (
+        <></>
     );
-    
 }
