@@ -5,7 +5,7 @@ import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@cl
 export default function Home() {
     return (
         <div className="">
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
+            {/* <header className="flex justify-end items-center p-4 gap-4 h-16">
                 <SignedOut>
                     <SignInButton mode="modal" />
                     <SignUpButton />
@@ -13,7 +13,7 @@ export default function Home() {
                 <SignedIn>
                     <UserButton />
                 </SignedIn>
-            </header>
+            </header> */}
         </div>
     );
 }
