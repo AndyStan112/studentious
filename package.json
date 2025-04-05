@@ -8,7 +8,8 @@
         "start": "next start",
         "lint": "next lint",
         "migrate": "npx dotenv -e .env -c development -- npx prisma  migrate dev",
-        "reset": "npx dotenv -e .env -c development -- npx prisma  migrate reset"
+        "reset": "npx dotenv -e .env -c development -- npx prisma  migrate reset",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@clerk/nextjs": "^6.13.0",
