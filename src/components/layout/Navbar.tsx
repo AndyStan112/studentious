@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import {
@@ -69,7 +69,8 @@ const Navbar: React.FC<NavbarProps> = ({
             <List>
                 {links.map((link) => (
                     <Link href={link.path} key={link.title} passHref>
-                        <ListItem button>
+                        <ListItem
+                            button
                             sx={{
                                 color: isActive(link.path) ? theme.palette.primary.main : "inherit",
                                 borderLeft: isActive(link.path)
