@@ -20,12 +20,13 @@ interface PageProps {
 export default function EventDetailPage({ params }: PageProps) {
     const [event, setEvent] = React.useState(null);
     const theme = useTheme();
+    const param = React.use(params);
 
     React.useEffect(() => {
-        getEventById(params.id).then((event1) => {
+        getEventById(param.id).then((event1) => {
             setEvent(event1);
         });
-    }, [params.id]); // Added params.id to dependency array
+    }, []);
 
     if (!event) return null;
 
@@ -49,14 +50,57 @@ export default function EventDetailPage({ params }: PageProps) {
                     </Typography>
 
                     <Box sx={{ my: 2 }}>
-                        <Typography variant="subtitle1">
-                            Start: {new Date(event.startTime).toLocaleString()}
-                        </Typography>
-                        {event.endTime && (
-                            <Typography variant="subtitle1">
-                                End: {new Date(event.endTime).toLocaleString()}
-                            </Typography>
-                        )}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle1" component="div">
+                                    <Box component="span" fontWeight="bold" color="text.secondary">
+                                        Starts
+                                    </Box>
+                                    <br />
+                                    {new Date(event.startTime).toLocaleDateString(undefined, {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                    })}
+                                    <Box component="span" sx={{ mx: 1 }}>
+                                        •
+                                    </Box>
+                                    {new Date(event.startTime).toLocaleTimeString(undefined, {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    })}
+                                </Typography>
+                            </Grid>
+
+                            {event.endTime && (
+                                <Grid item xs={12} md={6}>
+                                    <Typography variant="subtitle1" component="div">
+                                        <Box
+                                            component="span"
+                                            fontWeight="bold"
+                                            color="text.secondary"
+                                        >
+                                            Ends
+                                        </Box>
+                                        <br />
+                                        {new Date(event.endTime).toLocaleDateString(undefined, {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                        })}
+                                        <Box component="span" sx={{ mx: 1 }}>
+                                            •
+                                        </Box>
+                                        {new Date(event.endTime).toLocaleTimeString(undefined, {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })}
+                                    </Typography>
+                                </Grid>
+                            )}
+                        </Grid>
                     </Box>
 
                     <Box sx={{ my: 2 }}>
