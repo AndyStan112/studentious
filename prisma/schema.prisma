@@ -17,7 +17,7 @@ model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique
   name          String?
-  Interests     String[]
+  preferences   String[]
   events        Event[]        @relation("Organizer")
   registrations Registration[]
   createdAt     DateTime       @default(now())
