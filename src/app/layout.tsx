@@ -32,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <Navbar
                             links={[
                                 { title: "Home", path: "/" },
-                                { title: "About", path: "/calendar" },
+                                { title: "Events", path: "/events" },
+                                { title: "Chats", path: "/messages" },
+                                { title: "Profile", path: "/profile" },
                             ]}
                         />
                         <CssBaseline />
