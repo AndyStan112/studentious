@@ -4,9 +4,9 @@ import { Button, Container, Typography, Stack } from "@mui/material";
 import Link from "next/link";
 
 export default async function JoinedPage({ params }: { params: { id: string } }) {
-    console.log(params.id);
+    const { id } = await params;
     const event = await prisma.event.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             chat: {
                 select: {
@@ -18,12 +18,19 @@ export default async function JoinedPage({ params }: { params: { id: string } })
 
     if (!event) return notFound();
 
-    const icsUrl = `/api/calendar/${event.id}.ics`;
-    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-        event.title
-    )}&dates=${formatGoogleDate(event.startTime)}/${formatGoogleDate(
-        event.endTime ?? event.startTime
-    )}&details=${encodeURIComponent(event.description ?? "")}`;
+    const icsUrl = `/api/calendar/${event.id}`;
+    const location =
+        event.url ??
+        (event.lat && event.long ? `https://www.google.com/maps?q=${event.lat},${event.long}` : "");
+
+    const gcalUrl =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(event.title)}` +
+        `&dates=${formatGoogleDate(event.startTime)}/${formatGoogleDate(
+            event.endTime ?? event.startTime
+        )}` +
+        `&details=${encodeURIComponent(event.description ?? "")}` +
+        (location ? `&location=${encodeURIComponent(location)}` : "");
 
     return (
         <Container sx={{ mt: 6 }}>
