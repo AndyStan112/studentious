@@ -9,9 +9,15 @@ export async function createEvent(body: EventFormData) {
         throw new Error("User not authenticated");
     }
 
-    const { title, description, startTime, endTime, tags, image } = body;
+    const { title, description, startTime, endTime, tags, image, eventType, url, lat, long } = body;
 
-    if (!title || !startTime || !tags) {
+    if (
+        !title ||
+        !startTime ||
+        !tags ||
+        (eventType === "offline" && (!lat || !long)) ||
+        (eventType === "online" && !url)
+    ) {
         console.log(startTime);
         throw new Error("Missing or invalid required fields");
     }
@@ -42,6 +48,9 @@ export async function createEvent(body: EventFormData) {
             tags: tagsArray,
             organizer: { connect: { id: userRecord.id } },
             image: imageUrl,
+            url: eventType === "online" ? url : undefined,
+            lat: eventType === "offline" ? lat : undefined,
+            long: eventType === "offline" ? long : undefined,
         },
     });
 
