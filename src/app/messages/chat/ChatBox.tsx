@@ -105,8 +105,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
             const publishMessage = {
                 ...newMessage,
                 timestamp: Date.now(),
-                name: user.name,
-                profileImage: user.profileImage,
+                sender: { name: user.name, profileImage: user.profileImage },
             };
             const channel = ably.channels.get(`chat-${chatId}`);
             channel.publish("message", publishMessage);
