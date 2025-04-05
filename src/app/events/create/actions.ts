@@ -1,16 +1,18 @@
+"use server";
 import { EventFormData } from "@/components/CreateEventForm";
 import { prisma } from "@/utils";
 import { auth } from "@clerk/nextjs/server";
-
+import { put } from "@vercel/blob";
 export async function createEvent(body: EventFormData) {
     const { userId } = await auth();
     if (!userId) {
         throw new Error("User not authenticated");
     }
 
-    const { title, description, startTime, endTime, tags } = body;
+    const { title, description, startTime, endTime, tags, image } = body;
 
-    if (!title || !startTime || !tags || !Array.isArray(tags)) {
+    if (!title || !startTime || !tags) {
+        console.log(startTime);
         throw new Error("Missing or invalid required fields");
     }
 
@@ -25,6 +27,12 @@ export async function createEvent(body: EventFormData) {
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
 
+    const response = await put(image?.name!, image!, {
+        access: "public",
+    });
+
+    const imageUrl = response.url;
+
     const newEvent = await prisma.event.create({
         data: {
             title,
@@ -33,6 +41,7 @@ export async function createEvent(body: EventFormData) {
             endTime: endTime ? new Date(endTime) : null,
             tags: tagsArray,
             organizer: { connect: { id: userRecord.id } },
+            image: imageUrl,
         },
     });
 
