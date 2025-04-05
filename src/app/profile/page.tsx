@@ -7,7 +7,7 @@ import { Container, TextField, Button, Stack, Typography, CircularProgress } fro
 
 interface ProfileData {
     name: string;
-    preferences: string; // comma-separated string for UI, converted to string[] in API call
+    preferences: string;
 }
 
 export default function ProfilePage() {
@@ -20,7 +20,6 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // Fetch user profile data from our API
     useEffect(() => {
         if (isLoaded && isSignedIn && user) {
             const fetchProfile = async () => {
@@ -31,7 +30,7 @@ export default function ProfilePage() {
                         const data = await res.json();
                         setProfileData({
                             name: data.name || "",
-                            // Convert preferences array to comma-separated string for the UI
+
                             preferences: data.preferences ? data.preferences.join(", ") : "",
                         });
                     } else {
@@ -56,7 +55,6 @@ export default function ProfilePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        // Convert the comma-separated string into an array of trimmed strings
         const preferencesArray = profileData.preferences
             .split(",")
             .map((pref) => pref.trim())
@@ -68,7 +66,6 @@ export default function ProfilePage() {
                 body: JSON.stringify({ name: profileData.name, preferences: preferencesArray }),
             });
             if (res.ok) {
-                // Optionally, refresh or show a success message
                 router.refresh();
             } else {
                 console.error("Error saving profile");
