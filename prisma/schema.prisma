@@ -21,6 +21,10 @@ model User {
   events        Event[]        @relation("Organizer")
   registrations Registration[]
   createdAt     DateTime       @default(now())
+
+  Chat Chat[]
+
+  Messages Messages[]
 }
 
 model Event {
@@ -34,6 +38,8 @@ model Event {
   tags          String[]
   registrations Registration[]
   createdAt     DateTime       @default(now())
+
+  Chat Chat[]
 }
 
 model Registration {
@@ -45,4 +51,22 @@ model Registration {
   createdAt DateTime @default(now())
 
   @@unique([userId, eventId])
+}
+
+model Chat {
+  id        String     @id @default(uuid())
+  event   Event?   @relation(fields: [eventId], references: [id])
+  users     User[]
+  messages  Messages[]
+  eventId String? @unique
+}
+
+model Messages {
+  id        String   @id @default(uuid())
+  message   String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  senderId  String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chatId    String
+  timestamp DateTime @default(now())
 }
