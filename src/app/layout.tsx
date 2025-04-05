@@ -6,6 +6,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import theme from "../theme";
+import Navbar from "@/components/layout/Navbar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,8 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ClerkProvider>
-                    {/* Wrap with CacheProvider to ensure consistent class names */}
                     <ThemeProvider theme={theme}>
+                        <Navbar links={[]} />
                         <CssBaseline />
                         {children}
                     </ThemeProvider>
