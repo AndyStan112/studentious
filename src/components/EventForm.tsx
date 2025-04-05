@@ -1,9 +1,9 @@
 // components/EventForm.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Box, TextField, Button, Stack } from "@mui/material";
+import { Box, TextField, Button, Stack, Typography } from "@mui/material";
 
 interface FormData {
     title: string;
@@ -11,21 +11,39 @@ interface FormData {
     startTime: string;
     endTime: string;
     tags: string;
+    image: File | null;
 }
 
 export default function EventForm() {
     const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState<FormData>({
         title: "",
         description: "",
         startTime: "",
         endTime: "",
         tags: "",
+        image: null,
     });
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setFormData((prev) => ({ ...prev, image: file }));
+
+            // Create a preview URL for the selected image
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -36,22 +54,35 @@ export default function EventForm() {
             .map((tag) => tag.trim())
             .filter((tag) => tag.length > 0);
 
+        // Create FormData object for multipart/form-data submission (needed for file upload)
+        const submitData = new FormData();
+        submitData.append("title", formData.title);
+        submitData.append("description", formData.description);
+        submitData.append("startTime", formData.startTime);
+        submitData.append("endTime", formData.endTime);
+        submitData.append("tags", JSON.stringify(tagsArray));
+
+        // Append image if one was selected
+        if (formData.image) {
+            submitData.append("image", formData.image);
+        }
+
         const res = await fetch("/api/events", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                title: formData.title,
-                description: formData.description,
-                startTime: formData.startTime,
-                endTime: formData.endTime,
-                tags: tagsArray,
-            }),
+            // No Content-Type header needed as FormData sets it automatically with boundary
+            body: submitData,
         });
 
         if (res.ok) {
             router.push("/");
         } else {
             console.error("Failed to create event");
+        }
+    };
+
+    const triggerImageUpload = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
         }
     };
 
@@ -107,7 +138,42 @@ export default function EventForm() {
                     onChange={handleChange}
                     variant="outlined"
                 />
-                <Button type="submit" fullWidth variant="contained" color="primary">
+
+                {/* Hidden file input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={handleImageChange}
+                />
+
+                {/* Image upload button */}
+                <Button variant="outlined" onClick={triggerImageUpload} fullWidth>
+                    {formData.image ? "Change Event Image" : "Upload Event Image"}
+                </Button>
+
+                {/* Image preview */}
+                {imagePreview && (
+                    <Box sx={{ mt: 2, textAlign: "center" }}>
+                        <Typography variant="subtitle1" gutterBottom>
+                            Image Preview:
+                        </Typography>
+                        <Box
+                            component="img"
+                            src={imagePreview}
+                            alt="Event image preview"
+                            sx={{
+                                maxWidth: "100%",
+                                maxHeight: "300px",
+                                objectFit: "contain",
+                                borderRadius: 1,
+                            }}
+                        />
+                    </Box>
+                )}
+
+                <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 2 }}>
                     Create Event
                 </Button>
             </Stack>
