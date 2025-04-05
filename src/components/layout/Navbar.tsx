@@ -42,7 +42,7 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 }
 
 const Navbar: React.FC<NavbarProps> = ({
-    title = "My App",
+    title = "Studentious",
     links = [
         { title: "Home", path: "/" },
         { title: "About", path: "/calendar" },
@@ -70,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 {links.map((link) => (
                     <Link href={link.path} key={link.title} passHref>
                         <ListItem
-                            button
+                            component="a"
                             sx={{
                                 color: isActive(link.path) ? theme.palette.primary.main : "inherit",
                                 borderLeft: isActive(link.path)

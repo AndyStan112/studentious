@@ -29,7 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ClerkProvider>
                     <ThemeProvider theme={theme}>
-                        <Navbar links={[]} />
+                        <Navbar
+                            links={[
+                                { title: "Home", path: "/" },
+                                { title: "About", path: "/calendar" },
+                            ]}
+                        />
                         <CssBaseline />
                         {children}
                     </ThemeProvider>
