@@ -70,7 +70,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 {links.map((link) => (
                     <Link href={link.path} key={link.title} passHref>
                         <ListItem
-                            component="a"
                             sx={{
                                 color: isActive(link.path) ? theme.palette.primary.main : "inherit",
                                 borderLeft: isActive(link.path)
