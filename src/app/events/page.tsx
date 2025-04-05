@@ -11,6 +11,7 @@ import {
     Chip,
 } from "@mui/material";
 import { prisma } from "@/utils";
+import { joinEvent } from "./actions";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -166,6 +167,16 @@ export default async function EventsPage() {
                                                     >
                                                         View Details
                                                     </Button>
+                                                    <form
+                                                        action={async () => {
+                                                            "use server";
+                                                            await joinEvent(event.id);
+                                                        }}
+                                                    >
+                                                        <Button type="submit" size="small">
+                                                            Join
+                                                        </Button>
+                                                    </form>
                                                 </CardActions>
                                             </Card>
                                         </Grid>
