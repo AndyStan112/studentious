@@ -22,7 +22,7 @@ model User {
   registrations Registration[]
   createdAt     DateTime       @default(now())
 
-  Chat Chat[]
+  chats Chat[]
 
   Messages Messages[]
 }
@@ -39,7 +39,7 @@ model Event {
   registrations Registration[]
   createdAt     DateTime       @default(now())
 
-  Chat Chat[]
+  chat Chat[]
 }
 
 model Registration {
