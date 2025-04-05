@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 
     try {
         const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
+            where: { id: userId },
         });
 
         if (!user) {
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    const { userId } = getAuth(request);
+    const { userId } = getAuth(request as any);
 
     if (!userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -49,7 +49,7 @@ export async function PUT(request: Request) {
         }
 
         const updatedUser = await prisma.user.update({
-            where: { clerkId: userId },
+            where: { id: userId },
             data: { name, preferences },
         });
 
