@@ -22,6 +22,7 @@ import { Message } from "./types";
 import ChatMessage from "./ChatMessage";
 import Link from "next/link";
 import { getChatDetails } from "../actions";
+import theme from "@/theme";
 
 interface User {
     id: string;
@@ -64,7 +65,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                 const response = await axios.get(`/api/chat/${chatId}/messages`);
                 setMessages(response.data);
                 console.log("=====================================");
-                console.log(response.data)
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
@@ -77,20 +78,18 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
         messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    useEffect(()=>{
+    useEffect(() => {
         const fetchDetails = async () => {
             try {
-                const response =await getChatDetails(chatId);
-                console.log(response)
+                const response = await getChatDetails(chatId);
+                console.log(response);
                 setDetails(response);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
         };
         fetchDetails();
-        
-
-    },[chatId])
+    }, [chatId]);
 
     const sendChatMessage = async () => {
         if (!user || messageText.trim().length === 0) return;
@@ -103,7 +102,12 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
         try {
             await axios.post(`/api/chat/${chatId}/messages`, newMessage);
             console.log(user);
-            const publishMessage = {...newMessage,timestamp:Date.now(),name:user.name ,profileImage:user.profileImage}
+            const publishMessage = {
+                ...newMessage,
+                timestamp: Date.now(),
+                name: user.name,
+                profileImage: user.profileImage,
+            };
             const channel = ably.channels.get(`chat-${chatId}`);
             channel.publish("message", publishMessage);
 
@@ -126,7 +130,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
         );
 
     return (
-        <Stack flex={3} sx={{ backgroundColor: "#161b22" }}>
+        <Stack flex={3} sx={{ backgroundColor: theme.palette.background.default }}>
             <Toolbar sx={{ gap: 1, px: 1 }} disableGutters>
                 <Tooltip title="Go back to messages">
                     <IconButton
