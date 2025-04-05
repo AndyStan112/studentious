@@ -56,6 +56,7 @@ export default function EventForm() {
                 tags: eventFormData.tags,
                 image: eventFormData.image
             })
+        router.push("/events")
     };
 
     const triggerImageUpload = () => {
