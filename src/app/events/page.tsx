@@ -1,9 +1,15 @@
-// app/events/page.tsx
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
-import { Container, Typography, Button, Grid, Card, CardContent, CardActions } from "@mui/material";
-
-const prisma = new PrismaClient();
+import {
+    Container,
+    Typography,
+    Button,
+    Grid,
+    Card,
+    CardContent,
+    CardActions,
+    Box,
+} from "@mui/material";
+import { prisma } from "@/utils";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -15,11 +21,9 @@ function isSameDay(date1: Date, date2: Date): boolean {
 
 function groupEvents(events: any[]) {
     const now = new Date();
-    // Today's date with time zeroed out
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    // End of week: assuming week ends on Saturday (day index 6)
     const endOfWeek = new Date(today);
     endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 
@@ -52,7 +56,6 @@ function groupEvents(events: any[]) {
 }
 
 export default async function EventsPage() {
-    // Fetch events ordered by startTime ascending.
     const events = await prisma.event.findMany({
         orderBy: { startTime: "asc" },
     });
@@ -86,41 +89,68 @@ export default async function EventsPage() {
                                             item
                                             key={event.id}
                                             sx={{
-                                                width: 300, // fixed width for each card
+                                                width: 500,
                                             }}
                                         >
                                             <Card sx={{ width: "100%" }}>
-                                                <CardContent>
-                                                    <Typography variant="h6">
-                                                        {event.title}
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="body2"
-                                                        color="text.secondary"
-                                                    >
-                                                        {event.description ||
-                                                            "No description provided"}
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="caption"
-                                                        display="block"
-                                                        sx={{ mt: 1 }}
-                                                    >
-                                                        Start:{" "}
-                                                        {new Date(event.startTime).toLocaleString()}
-                                                    </Typography>
-                                                    {event.endTime && (
+                                                <Box display="flex" justifyContent="space-between">
+                                                    <CardContent>
+                                                        <Typography variant="h6">
+                                                            {event.title}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="text.secondary"
+                                                        >
+                                                            {event.description ||
+                                                                "No description provided"}
+                                                        </Typography>
                                                         <Typography
                                                             variant="caption"
                                                             display="block"
+                                                            sx={{ mt: 1 }}
                                                         >
-                                                            End:{" "}
+                                                            Start:{" "}
                                                             {new Date(
-                                                                event.endTime
+                                                                event.startTime
                                                             ).toLocaleString()}
                                                         </Typography>
-                                                    )}
-                                                </CardContent>
+                                                        {event.endTime && (
+                                                            <Typography
+                                                                variant="caption"
+                                                                display="block"
+                                                            >
+                                                                End:{" "}
+                                                                {new Date(
+                                                                    event.endTime
+                                                                ).toLocaleString()}
+                                                            </Typography>
+                                                        )}
+                                                    </CardContent>
+                                                    <Box
+                                                        sx={{
+                                                            width: 120,
+                                                            height: 120,
+                                                            m: 2,
+                                                            borderRadius: 2,
+                                                            overflow: "hidden",
+                                                            flexShrink: 0,
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={
+                                                                event.image ||
+                                                                "/default_event.png"
+                                                            }
+                                                            alt={event.title}
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                </Box>
                                                 <CardActions>
                                                     <Button
                                                         size="small"
