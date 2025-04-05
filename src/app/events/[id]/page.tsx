@@ -1,9 +1,7 @@
 // app/events/[id]/page.tsx
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/utils";
 import { notFound } from "next/navigation";
 import { Container, Typography, Box, Chip, Grid } from "@mui/material";
-
-const prisma = new PrismaClient();
 
 interface PageProps {
     params: {
@@ -12,7 +10,7 @@ interface PageProps {
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
-    const eventId = parseInt(params.id, 10);
+    const eventId = params.id;
 
     const event = await prisma.event.findUnique({
         where: { id: eventId },
