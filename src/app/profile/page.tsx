@@ -17,7 +17,7 @@ import {
 
 interface ProfileData {
     name: string;
-    preferences: string; // Comma-separated string in the UI
+    preferences: string; // Comma-separated string for UI
     profileImage: string; // URL for the profile picture
 }
 
@@ -31,9 +31,9 @@ export default function ProfilePage() {
     });
     const [loading, setLoading] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
-    const [uploading, setUploading] = useState<boolean>(false);
+    const [file, setFile] = useState<File | null>(null);
 
-    // Fetch the user's current profile data
+    // Fetch the user's current profile data from /api/profile
     useEffect(() => {
         if (isLoaded && isSignedIn) {
             const fetchProfile = async () => {
@@ -60,64 +60,47 @@ export default function ProfilePage() {
         }
     }, [isLoaded, isSignedIn]);
 
+    // Handle text field changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Handle file input change and upload the image
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setUploading(true);
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-            // Upload the file to /api/upload
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-            if (res.ok) {
-                const data = await res.json();
-                // Update the profile image URL in state
-                setProfileData((prev) => ({ ...prev, profileImage: data.url }));
-            } else {
-                console.error("File upload failed");
-            }
-        } catch (error) {
-            console.error("Error uploading file", error);
-        } finally {
-            setUploading(false);
+    // Handle file selection for profile picture
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            // Optionally update the preview image
+            setProfileData((prev) => ({
+                ...prev,
+                profileImage: URL.createObjectURL(selectedFile),
+            }));
         }
     };
 
-    // Submit updated profile data
+    // Handle form submission by sending FormData to /api/profile (PUT)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
         try {
-            // Convert preferences from comma-separated string to an array
-            const preferencesArray = profileData.preferences
-                .split(",")
-                .map((pref) => pref.trim())
-                .filter((pref) => pref.length > 0);
+            const formData = new FormData();
+            formData.append("name", profileData.name);
+            formData.append("preferences", profileData.preferences);
+            if (file) {
+                formData.append("profileImage", file);
+            }
             const res = await fetch("/api/profile", {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: profileData.name,
-                    preferences: preferencesArray,
-                    profileImage: profileData.profileImage,
-                }),
+                body: formData,
             });
             if (res.ok) {
                 router.refresh();
             } else {
-                console.error("Error saving profile");
+                console.error("Error updating profile");
             }
         } catch (error) {
-            console.error("Error saving profile", error);
+            console.error("Error updating profile", error);
         } finally {
             setSaving(false);
         }
@@ -145,45 +128,41 @@ export default function ProfilePage() {
                 <Typography variant="h5" gutterBottom>
                     Profile Settings
                 </Typography>
-                <Stack spacing={2}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar src={profileData.profileImage} sx={{ width: 80, height: 80 }} />
-                        <Button variant="contained" component="label" disabled={uploading}>
-                            {uploading ? "Uploading..." : "Change Picture"}
-                            <input
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleFileChange}
-                            />
+                <form onSubmit={handleSubmit} noValidate>
+                    <Stack spacing={2}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Avatar src={profileData.profileImage} sx={{ width: 80, height: 80 }} />
+                            <Button variant="contained" component="label">
+                                Change Picture
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
+                        </Stack>
+                        <TextField
+                            label="Name"
+                            name="name"
+                            value={profileData.name}
+                            onChange={handleChange}
+                            fullWidth
+                            variant="outlined"
+                        />
+                        <TextField
+                            label="Preferences (comma separated)"
+                            name="preferences"
+                            value={profileData.preferences}
+                            onChange={handleChange}
+                            fullWidth
+                            variant="outlined"
+                        />
+                        <Button type="submit" variant="contained" color="primary" disabled={saving}>
+                            {saving ? "Saving..." : "Save Changes"}
                         </Button>
                     </Stack>
-                    <TextField
-                        label="Name"
-                        name="name"
-                        value={profileData.name}
-                        onChange={handleChange}
-                        variant="outlined"
-                        fullWidth
-                    />
-                    <TextField
-                        label="Preferences (comma separated)"
-                        name="preferences"
-                        value={profileData.preferences}
-                        onChange={handleChange}
-                        variant="outlined"
-                        fullWidth
-                    />
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSubmit}
-                        disabled={saving}
-                    >
-                        {saving ? "Saving..." : "Save Changes"}
-                    </Button>
-                </Stack>
+                </form>
             </Paper>
         </Container>
     );
