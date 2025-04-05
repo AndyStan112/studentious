@@ -5,7 +5,6 @@ import { prisma } from "@/utils";
 import { redirect } from "next/navigation";
 
 export async function joinEvent(eventId: string) {
-    redirect(`/events/joined/${eventId}`);
     const { userId } = await auth();
 
     if (!userId) throw new Error("Not authenticated");
@@ -30,4 +29,5 @@ export async function joinEvent(eventId: string) {
             },
         },
     });
+    redirect(`/events/joined/${eventId}`);
 }
