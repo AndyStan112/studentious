@@ -51,7 +51,6 @@ const Navbar: React.FC<NavbarProps> = ({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const router = useRouter();
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
@@ -158,7 +157,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 open={drawerOpen}
                 onClose={handleDrawerToggle}
                 ModalProps={{
-                    keepMounted: true, // Better open performance on mobile
+                    keepMounted: true,
                 }}
                 sx={{
                     display: { xs: "block", md: "none" },
