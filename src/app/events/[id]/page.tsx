@@ -10,7 +10,8 @@ interface PageProps {
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
-    const eventId = params.id;
+    const res = await params;
+    const eventId = res.id;
 
     const event = await prisma.event.findUnique({
         where: { id: eventId },
