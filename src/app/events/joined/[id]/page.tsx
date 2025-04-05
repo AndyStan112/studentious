@@ -4,6 +4,7 @@ import { Button, Container, Typography, Stack } from "@mui/material";
 import Link from "next/link";
 
 export default async function JoinedPage({ params }: { params: { id: string } }) {
+    console.log(params.id);
     const event = await prisma.event.findUnique({
         where: { id: params.id },
         include: {
@@ -40,9 +41,9 @@ export default async function JoinedPage({ params }: { params: { id: string } })
                     Google Calendar
                 </Button>
                 {/* stupid prisma thinks it is a many to many even though it is optional one to one */}
-                <Button component={Link} href={`/messages/${event.chat[0].id}`}>
+                {/* <Button component={Link} href={`/messages/${event.chat[0].id}`}>
                     Back to Events
-                </Button>
+                </Button> */}
                 <Button component={Link} href="/events">
                     Back to Events
                 </Button>
