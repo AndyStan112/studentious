@@ -1,13 +1,24 @@
+// app/profile/page.tsx
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Container, TextField, Button, Stack, Typography, CircularProgress } from "@mui/material";
+import {
+    Container,
+    Paper,
+    Typography,
+    TextField,
+    Button,
+    Stack,
+    CircularProgress,
+    Avatar,
+} from "@mui/material";
 
 interface ProfileData {
     name: string;
-    preferences: string;
+    preferences: string; // Comma-separated string in the UI
+    profileImage: string; // URL for the profile picture
 }
 
 export default function ProfilePage() {
@@ -16,12 +27,15 @@ export default function ProfilePage() {
     const [profileData, setProfileData] = useState<ProfileData>({
         name: "",
         preferences: "",
+        profileImage: "",
     });
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [saving, setSaving] = useState<boolean>(false);
+    const [uploading, setUploading] = useState<boolean>(false);
 
+    // Fetch the user's current profile data
     useEffect(() => {
-        if (isLoaded && isSignedIn && user) {
+        if (isLoaded && isSignedIn) {
             const fetchProfile = async () => {
                 setLoading(true);
                 try {
@@ -30,8 +44,8 @@ export default function ProfilePage() {
                         const data = await res.json();
                         setProfileData({
                             name: data.name || "",
-
                             preferences: data.preferences ? data.preferences.join(", ") : "",
+                            profileImage: data.profileImage || "",
                         });
                     } else {
                         console.error("Error fetching profile data");
@@ -42,28 +56,60 @@ export default function ProfilePage() {
                     setLoading(false);
                 }
             };
-
             fetchProfile();
         }
-    }, [isLoaded, isSignedIn, user]);
+    }, [isLoaded, isSignedIn]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
     };
 
+    // Handle file input change and upload the image
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            // Upload the file to /api/upload
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+            if (res.ok) {
+                const data = await res.json();
+                // Update the profile image URL in state
+                setProfileData((prev) => ({ ...prev, profileImage: data.url }));
+            } else {
+                console.error("File upload failed");
+            }
+        } catch (error) {
+            console.error("Error uploading file", error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    // Submit updated profile data
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const preferencesArray = profileData.preferences
-            .split(",")
-            .map((pref) => pref.trim())
-            .filter((pref) => pref.length > 0);
         try {
+            // Convert preferences from comma-separated string to an array
+            const preferencesArray = profileData.preferences
+                .split(",")
+                .map((pref) => pref.trim())
+                .filter((pref) => pref.length > 0);
             const res = await fetch("/api/profile", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: profileData.name, preferences: preferencesArray }),
+                body: JSON.stringify({
+                    name: profileData.name,
+                    preferences: preferencesArray,
+                    profileImage: profileData.profileImage,
+                }),
             });
             if (res.ok) {
                 router.refresh();
@@ -94,12 +140,24 @@ export default function ProfilePage() {
     }
 
     return (
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Profile Settings
-            </Typography>
-            <form onSubmit={handleSubmit} noValidate>
+        <Container sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
+            <Paper elevation={3} sx={{ p: 4, maxWidth: 500, width: "100%" }}>
+                <Typography variant="h5" gutterBottom>
+                    Profile Settings
+                </Typography>
                 <Stack spacing={2}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar src={profileData.profileImage} sx={{ width: 80, height: 80 }} />
+                        <Button variant="contained" component="label" disabled={uploading}>
+                            {uploading ? "Uploading..." : "Change Picture"}
+                            <input
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                        </Button>
+                    </Stack>
                     <TextField
                         label="Name"
                         name="name"
@@ -116,11 +174,17 @@ export default function ProfilePage() {
                         variant="outlined"
                         fullWidth
                     />
-                    <Button type="submit" variant="contained" color="primary" disabled={saving}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                        disabled={saving}
+                    >
                         {saving ? "Saving..." : "Save Changes"}
                     </Button>
                 </Stack>
-            </form>
+            </Paper>
         </Container>
     );
 }
