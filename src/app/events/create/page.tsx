@@ -13,7 +13,7 @@ export default function CreateEventModalPage() {
     const router = useRouter();
 
     const handleClose = () => {
-        router.push("/");
+        router.push("/events");
     };
 
     return (
