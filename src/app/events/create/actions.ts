@@ -1,11 +1,8 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { auth } from "@clerk/nextjs/server";
 import { EventFormData } from "@/components/CreateEventForm";
+import { prisma } from "@/utils";
+import { auth } from "@clerk/nextjs/server";
 
-const prisma = new PrismaClient();
-
-export async function POST(body: EventFormData) {
+export async function createEvent(body: EventFormData) {
     const { userId } = await auth();
     if (!userId) {
         throw new Error("User not authenticated");
@@ -23,6 +20,10 @@ export async function POST(body: EventFormData) {
     if (!userRecord) {
         throw new Error("User not found in DB");
     }
+    const tagsArray = tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
 
     const newEvent = await prisma.event.create({
         data: {
@@ -30,20 +31,10 @@ export async function POST(body: EventFormData) {
             description,
             startTime: new Date(startTime),
             endTime: endTime ? new Date(endTime) : null,
-            tags,
+            tags: tagsArray,
             organizer: { connect: { id: userRecord.id } },
         },
     });
 
     return newEvent;
-}
-
-export async function GET() {
-    try {
-        const events = await prisma.event.findMany();
-        return NextResponse.json(events, { status: 200 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Error fetching events" }, { status: 500 });
-    }
 }

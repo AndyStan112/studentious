@@ -1,4 +1,3 @@
-// app/events/create/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -6,8 +5,7 @@ import dynamic from "next/dynamic";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// Dynamically import the event form (client component)
-const EventForm = dynamic(() => import("../../../components/EventForm"), { ssr: false });
+const EventForm = dynamic(() => import("../../../components/CreateEventForm"), { ssr: false });
 
 export default function CreateEventModalPage() {
     const router = useRouter();

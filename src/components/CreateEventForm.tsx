@@ -1,11 +1,11 @@
-// components/EventForm.tsx
 "use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Box, TextField, Button, Stack } from "@mui/material";
+import { createEvent } from "@/app/events/create/actions";
 
-interface FormData {
+export interface EventFormData {
     title: string;
     description: string;
     startTime: string;
@@ -15,7 +15,7 @@ interface FormData {
 
 export default function EventForm() {
     const router = useRouter();
-    const [formData, setFormData] = useState<FormData>({
+    const [eventFormData, setEventFormData] = useState<EventFormData>({
         title: "",
         description: "",
         startTime: "",
@@ -25,34 +25,19 @@ export default function EventForm() {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setEventFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        // Convert comma-separated tags to an array of trimmed strings
-        const tagsArray = formData.tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter((tag) => tag.length > 0);
 
-        const res = await fetch("/api/events", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                title: formData.title,
-                description: formData.description,
-                startTime: formData.startTime,
-                endTime: formData.endTime,
-                tags: tagsArray,
-            }),
-        });
-
-        if (res.ok) {
-            router.push("/");
-        } else {
-            console.error("Failed to create event");
-        }
+        await createEvent({
+                title: eventFormData.title,
+                description: eventFormData.description,
+                startTime: eventFormData.startTime,
+                endTime: eventFormData.endTime,
+                tags: eventFormData.tags,
+            })
     };
 
     return (
@@ -63,7 +48,7 @@ export default function EventForm() {
                     fullWidth
                     label="Event Title"
                     name="title"
-                    value={formData.title}
+                    value={eventFormData.title}
                     onChange={handleChange}
                     variant="outlined"
                 />
@@ -71,7 +56,7 @@ export default function EventForm() {
                     fullWidth
                     label="Event Description"
                     name="description"
-                    value={formData.description}
+                    value={eventFormData.description}
                     onChange={handleChange}
                     multiline
                     rows={4}
@@ -84,7 +69,7 @@ export default function EventForm() {
                     name="startTime"
                     type="datetime-local"
                     InputLabelProps={{ shrink: true }}
-                    value={formData.startTime}
+                    value={eventFormData.startTime}
                     onChange={handleChange}
                     variant="outlined"
                 />
@@ -94,7 +79,7 @@ export default function EventForm() {
                     name="endTime"
                     type="datetime-local"
                     InputLabelProps={{ shrink: true }}
-                    value={formData.endTime}
+                    value={eventFormData.endTime}
                     onChange={handleChange}
                     variant="outlined"
                 />
@@ -103,7 +88,7 @@ export default function EventForm() {
                     fullWidth
                     label="Tags (comma separated)"
                     name="tags"
-                    value={formData.tags}
+                    value={eventFormData.tags}
                     onChange={handleChange}
                     variant="outlined"
                 />
