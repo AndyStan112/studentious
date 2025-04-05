@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Event" ADD COLUMN     "lat" DOUBLE PRECISION,
+ADD COLUMN     "long" DOUBLE PRECISION,
+ADD COLUMN     "url" TEXT;

@@ -21,7 +21,7 @@ model User {
   events        Event[]        @relation("Organizer")
   registrations Registration[]
   createdAt     DateTime       @default(now())
-  profileImage String
+  profileImage  String
 
   chats Chat[]
 
@@ -40,6 +40,9 @@ model Event {
   registrations Registration[]
   createdAt     DateTime       @default(now())
   image         String         @default("")
+  url           String?
+  lat           Float?
+  long          Float?
 
   chat Chat[]
 }
@@ -56,11 +59,11 @@ model Registration {
 }
 
 model Chat {
-  id        String     @id @default(uuid())
-  event   Event?   @relation(fields: [eventId], references: [id])
-  users     User[]
-  messages  Messages[]
-  eventId String? @unique
+  id       String     @id @default(uuid())
+  event    Event?     @relation(fields: [eventId], references: [id])
+  users    User[]
+  messages Messages[]
+  eventId  String?    @unique
 }
 
 model Messages {
