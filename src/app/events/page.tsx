@@ -8,6 +8,7 @@ import {
     CardContent,
     CardActions,
     Box,
+    Chip,
 } from "@mui/material";
 import { prisma } from "@/utils";
 
@@ -126,6 +127,13 @@ export default async function EventsPage() {
                                                                 ).toLocaleString()}
                                                             </Typography>
                                                         )}
+                                                        <Chip
+                                                            label={event.url ? "Online" : "Offline"}
+                                                            color={
+                                                                event.url ? "success" : "default"
+                                                            }
+                                                            sx={{ mt: 1 }}
+                                                        />
                                                     </CardContent>
                                                     <Box
                                                         sx={{
@@ -139,8 +147,7 @@ export default async function EventsPage() {
                                                     >
                                                         <img
                                                             src={
-                                                                event.image ||
-                                                                "/default_event.png"
+                                                                event.image || "/default_event.png"
                                                             }
                                                             alt={event.title}
                                                             style={{
