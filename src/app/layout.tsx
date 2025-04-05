@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import theme from "../theme";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -20,23 +21,7 @@ export const metadata: Metadata = {
     description: "A platform for group learning sessions.",
 };
 
-const theme = createTheme({
-    palette: {
-        mode: "light", // Change to 'dark' if needed
-        primary: {
-            main: "#1976d2",
-        },
-        secondary: {
-            main: "#dc004e",
-        },
-    },
-    typography: {
-        // Optionally, you could use your Geist fonts here or combine with your preferred typography
-        fontFamily: '"Inter", sans-serif',
-    },
-});
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
