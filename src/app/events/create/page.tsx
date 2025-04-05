@@ -32,7 +32,6 @@ export interface EventFormData {
     long?: number;
 }
 
-// Dynamically import the Map component with SSR disabled
 const Map = dynamic(() => import("@/components/input/LeafletMap"), {
     ssr: false,
     loading: () => (
@@ -180,7 +179,6 @@ export default function EventForm() {
                             />
                         </Box>
 
-                        {/* Event type selection */}
                         <FormControl component="fieldset">
                             <FormLabel component="legend">Event Type</FormLabel>
                             <RadioGroup
@@ -202,7 +200,6 @@ export default function EventForm() {
                             </RadioGroup>
                         </FormControl>
 
-                        {/* Conditional rendering based on event type */}
                         {eventFormData.eventType === "online" && (
                             <TextField
                                 required
@@ -240,7 +237,6 @@ export default function EventForm() {
                             variant="outlined"
                         />
 
-                        {/* Hidden file input */}
                         <input
                             type="file"
                             ref={fileInputRef}
@@ -249,12 +245,10 @@ export default function EventForm() {
                             onChange={handleImageChange}
                         />
 
-                        {/* Image upload button */}
                         <Button variant="outlined" onClick={triggerImageUpload} fullWidth>
                             {eventFormData.image ? "Change Event Image" : "Upload Event Image"}
                         </Button>
 
-                        {/* Image preview */}
                         {imagePreview && (
                             <Box sx={{ textAlign: "center" }}>
                                 <Typography variant="subtitle2" gutterBottom>

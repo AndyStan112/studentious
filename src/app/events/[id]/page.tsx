@@ -5,6 +5,7 @@ import { Container, Typography, Box, Chip, Grid, useTheme } from "@mui/material"
 import dynamic from "next/dynamic";
 import { getEventById } from "./actions";
 import React from "react";
+import { Event, Registration, User } from "@prisma/client";
 
 const EventMap = dynamic(() => import("@/components/EventMap"), {
     ssr: false,
@@ -16,16 +17,18 @@ interface PageProps {
         id: string;
     };
 }
+export interface EventWithOrganizer extends Event {
+    organizer: User;
+    registrations: Registration[];
+}
 
 export default function EventDetailPage({ params }: PageProps) {
-    const [event, setEvent] = React.useState(null);
+    const [event, setEvent] = React.useState<EventWithOrganizer | null>(null);
     const theme = useTheme();
     const param = React.use(params);
 
     React.useEffect(() => {
-        getEventById(param.id).then((event1) => {
-            setEvent(event1);
-        });
+        getEventById(param.id).then((event1) => setEvent(event1));
     }, []);
 
     if (!event) return null;
@@ -40,7 +43,6 @@ export default function EventDetailPage({ params }: PageProps) {
                 maxWidth="md"
                 mx="auto"
             >
-                {/* Text Content */}
                 <Box flex={1} order={{ xs: 1, md: 0 }}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         {event.title}

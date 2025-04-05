@@ -1,5 +1,5 @@
 "use server";
-import { EventFormData } from "@/components/CreateEventForm";
+import { EventFormData } from "./page";
 import { prisma } from "@/utils";
 import { auth } from "@clerk/nextjs/server";
 import { put } from "@vercel/blob";

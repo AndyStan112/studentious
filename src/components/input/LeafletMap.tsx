@@ -5,11 +5,9 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix Leaflet icon issues
 function fixLeafletIcon() {
-    // Only run this in the browser
     if (typeof window !== "undefined") {
-        // @ts-ignore - Leaflet's icon default is not typed properly
+        // @ts-ignore
         delete L.Icon.Default.prototype._getIconUrl;
 
         L.Icon.Default.mergeOptions({
@@ -22,7 +20,6 @@ function fixLeafletIcon() {
     }
 }
 
-// LocationMarker component to handle map clicks
 function LocationPicker({ position, onPositionChange }) {
     useMapEvents({
         click(e) {

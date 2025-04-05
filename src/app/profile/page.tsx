@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -17,12 +16,12 @@ import {
 
 interface ProfileData {
     name: string;
-    preferences: string; // Comma-separated string for UI
-    profileImage: string; // URL for the profile picture
+    preferences: string;
+    profileImage: string;
 }
 
 export default function ProfilePage() {
-    const { user, isLoaded, isSignedIn } = useUser();
+    const { isLoaded, isSignedIn } = useUser();
     const router = useRouter();
     const [profileData, setProfileData] = useState<ProfileData>({
         name: "",
@@ -33,7 +32,6 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState<boolean>(false);
     const [file, setFile] = useState<File | null>(null);
 
-    // Fetch the user's current profile data from /api/profile
     useEffect(() => {
         if (isLoaded && isSignedIn) {
             const fetchProfile = async () => {
@@ -60,18 +58,15 @@ export default function ProfilePage() {
         }
     }, [isLoaded, isSignedIn]);
 
-    // Handle text field changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Handle file selection for profile picture
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
             setFile(selectedFile);
-            // Optionally update the preview image
             setProfileData((prev) => ({
                 ...prev,
                 profileImage: URL.createObjectURL(selectedFile),
@@ -79,7 +74,6 @@ export default function ProfilePage() {
         }
     };
 
-    // Handle form submission by sending FormData to /api/profile (PUT)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
