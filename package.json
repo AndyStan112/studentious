@@ -23,11 +23,13 @@
         "ably": "^2.6.5",
         "axios": "^1.8.4",
         "emotion": "^11.0.0",
+        "leaflet": "^1.9.4",
         "mui": "^0.0.1",
         "mui-markdown": "^1.2.6",
         "next": "15.2.4",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "react-leaflet": "^5.0.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
