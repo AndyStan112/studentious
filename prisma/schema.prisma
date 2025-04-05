@@ -31,6 +31,7 @@ model Event {
   endTime       DateTime?
   organizer     User           @relation("Organizer", fields: [organizerId], references: [id])
   organizerId   Int
+  tags          String[]
   registrations Registration[]
   createdAt     DateTime       @default(now())
 }
