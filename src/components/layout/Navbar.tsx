@@ -20,7 +20,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface NavbarProps {
     title?: string;
@@ -58,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = ({
     };
 
     const isActive = (path: string) => {
-        return router.pathname === path;
+        return usePathname() === path;
     };
 
     const drawer = (
