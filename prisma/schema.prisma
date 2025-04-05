@@ -39,6 +39,7 @@ model Event {
   tags          String[]
   registrations Registration[]
   createdAt     DateTime       @default(now())
+  image         String         @default("")
 
   chat Chat[]
 }
