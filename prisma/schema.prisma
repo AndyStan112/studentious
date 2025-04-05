@@ -21,6 +21,7 @@ model User {
   events        Event[]        @relation("Organizer")
   registrations Registration[]
   createdAt     DateTime       @default(now())
+  profileImage String
 
   chats Chat[]
 
