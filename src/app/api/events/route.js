@@ -1,10 +1,6 @@
-// app/api/events/route.js
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { getAuth } from "@clerk/nextjs/server";
-
-const prisma = new PrismaClient();
-
+import prisma from "@/utils";
 export async function POST(request) {
     const { userId } = getAuth(request);
     if (!userId) {
