@@ -39,7 +39,7 @@ export async function createEvent(body: EventFormData) {
 
     const imageUrl = response.url;
 
-    const newEvent = await prisma.event.create({
+    await prisma.event.create({
         data: {
             title,
             description,
@@ -51,8 +51,7 @@ export async function createEvent(body: EventFormData) {
             url: eventType === "online" ? url : undefined,
             lat: eventType === "offline" ? lat : undefined,
             long: eventType === "offline" ? long : undefined,
+            chat: { create: { users: { connect: { id: userId } } } },
         },
     });
-
-    return newEvent;
 }
