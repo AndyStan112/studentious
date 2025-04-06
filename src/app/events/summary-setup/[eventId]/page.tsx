@@ -1,8 +1,8 @@
 "use client";
-// export const dynamic = "force-dynamic";
 import { useParams, useRouter } from "next/navigation";
 import { Box, Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useState, useRef } from "react";
+import { generateAudioFromText } from "@/app/events/summary-setup/actions"; // add this import
 
 import {
     generateSummaryFromUrls,
@@ -33,6 +33,8 @@ export default function SummarySetup() {
         }
     };
 
+    const [audioUrl, setAudioUrl] = useState<string | null>(null); // new state
+
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -46,8 +48,11 @@ export default function SummarySetup() {
             }
 
             console.log("Uploaded URLs:", curriculumUrls);
-            await generateSummaryFromUrls(curriculumUrls);
-            // router.push("/events/my-events");
+
+            const summary = await generateSummaryFromUrls(curriculumUrls);
+            setSummaryText(summary);
+            const audio = await generateAudioFromText(summary);
+            setAudioUrl(audio);
         } catch (err) {
             console.error(err);
         } finally {
@@ -82,7 +87,14 @@ export default function SummarySetup() {
                         ))}
                     </Box>
                 )}
-
+                {audioUrl && (
+                    <Box mt={2}>
+                        <Typography variant="subtitle1" gutterBottom>
+                            AI-generated audio summary:
+                        </Typography>
+                        <audio controls src={audioUrl} style={{ width: "100%" }} />
+                    </Box>
+                )}
                 <Button variant="contained" onClick={handleSubmit} disabled={loading}>
                     {loading ? "Saving..." : "Continue"}
                 </Button>

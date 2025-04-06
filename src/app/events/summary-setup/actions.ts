@@ -84,3 +84,21 @@ export async function generateSummaryFromUrls(urls: string[]) {
     console.log(response.output_text);
     return response.output_text;
 }
+export async function generateAudioFromText(text: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const response = await openai.audio.speech.create({
+        model: "tts-1-hd",
+        voice: "nova",
+        input: text,
+    });
+
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+
+    const file = new File([audioBlob], "summary.mp3", { type: "audio/mpeg" });
+    const uploaded = await put("summary.mp3", file, { access: "public" });
+
+    return uploaded.url;
+}
