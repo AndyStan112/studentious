@@ -1,12 +1,13 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { Container, Typography, Box, Chip, Grid, useTheme } from "@mui/material";
+import { Container, Typography, Box, Chip, Grid, useTheme, Button, Link } from "@mui/material";
 import dynamic from "next/dynamic";
 import { getEventById } from "./actions";
 import React from "react";
 import { Event, Registration, User } from "@prisma/client";
 import MuiMarkdown from "mui-markdown";
+import { joinEvent } from "../actions";
 
 const EventMap = dynamic(() => import("@/components/display/EventMap"), {
     ssr: false,
@@ -21,6 +22,7 @@ interface PageProps {
 export interface EventWithOrganizer extends Event {
     organizer: User;
     registrations: Registration[];
+    joined: boolean;
 }
 
 export default function EventDetailPage({ params }: PageProps) {
@@ -36,6 +38,32 @@ export default function EventDetailPage({ params }: PageProps) {
 
     return (
         <Container sx={{ mt: 4 }}>
+            <Box maxWidth="md" mx="auto" mb={3} display="flex" justifyContent="space-between">
+                <Button component={Link} href="/">
+                    Back
+                </Button>
+                <form
+                    action={async () => {
+                        await joinEvent(event.id);
+                    }}
+                >
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={event.joined}
+                        sx={{
+                            backgroundColor: event.joined ? "grey.500" : "primary.main",
+                            color: "white",
+                            "&:hover": {
+                                backgroundColor: event.joined ? "grey.700" : "primary.dark",
+                            },
+                        }}
+                    >
+                        {event.joined ? "Joined" : "Join"}
+                    </Button>
+                </form>
+            </Box>
+
             <Box
                 display="flex"
                 flexDirection={{ xs: "column", md: "row" }}
@@ -178,6 +206,7 @@ export default function EventDetailPage({ params }: PageProps) {
                     </Box>
                 </Box>
             )}
+
             {event.summary && (
                 <Box sx={{ my: 4, maxWidth: "md", mx: "auto" }}>
                     <Typography variant="h6" gutterBottom>
