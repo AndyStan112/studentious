@@ -178,6 +178,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
             sx={{
                 //  borderLeft: 1,
                 backgroundColor: theme.palette.background.default,
+                minWidth: "350px",
             }}
         >
             <Toolbar sx={{ gap: 1, ml: 3 }} disableGutters>
@@ -219,6 +220,8 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                     // borderRadius: 2,
                     boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
                     border: "1px solid #e0e0e0",
+                    minWidth: "320px",
+                    minHeight: "400px",
                 }}
                 disableGutters
             >

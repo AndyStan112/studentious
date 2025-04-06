@@ -4,7 +4,8 @@ import { Button, Container, Typography, Stack } from "@mui/material";
 import Link from "next/link";
 
 export default async function JoinedPage({ params }: { params: { id: string } }) {
-    const { id } = await params;
+    const param = await params;
+    const { id } = param;
     const event = await prisma.event.findUnique({
         where: { id },
         include: {
@@ -40,18 +41,49 @@ export default async function JoinedPage({ params }: { params: { id: string } })
             <Typography variant="h6" gutterBottom>
                 {event.title}
             </Typography>
-            <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
-                <Button variant="contained" href={icsUrl}>
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems="center"
+                sx={{ mt: 4 }}
+            >
+                <Button
+                    variant="contained"
+                    href={icsUrl}
+                    sx={{
+                        width: { xs: "50%", sm: "auto" },
+                    }}
+                >
                     Add to Calendar (.ics)
                 </Button>
-                <Button variant="outlined" href={gcalUrl} target="_blank">
+                <Button
+                    variant="outlined"
+                    href={gcalUrl}
+                    target="_blank"
+                    sx={{
+                        width: { xs: "50%", sm: "auto" },
+                    }}
+                >
                     Google Calendar
                 </Button>
-                {/* stupid prisma thinks it is a many to many even though it is optional one to one */}
-                <Button component={Link} href={`/messages/${event.chat[0].id}`}>
-                    Back to Events
-                </Button>
-                <Button component={Link} href="/events">
+                {event.chat && event.chat.length > 0 && (
+                    <Button
+                        component={Link}
+                        href={`/messages/${event.chat[0].id}`}
+                        sx={{
+                            width: { xs: "50%", sm: "auto" },
+                        }}
+                    >
+                        Event Chat
+                    </Button>
+                )}
+                <Button
+                    component={Link}
+                    href="/events"
+                    sx={{
+                        width: { xs: "50%", sm: "auto" },
+                    }}
+                >
                     Back to Events
                 </Button>
             </Stack>
