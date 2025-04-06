@@ -13,16 +13,17 @@ import {
     Toolbar,
     Typography,
     Skeleton,
+    Button,
 } from "@mui/material";
 import { getChats } from "./actions";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function MessagesPage({ children }: { children: React.ReactNode }) {
+export default function MessagesPage({ children }) {
     const pathname = usePathname();
     const isChatPage = /^\/messages\/.+/.test(pathname);
 
-    const [chats, setChats] = useState<any[]>([]);
+    const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -59,45 +60,62 @@ export default function MessagesPage({ children }: { children: React.ReactNode }
                 </Toolbar>
 
                 <Box flex={1} sx={{ overflowY: "auto" }}>
-                    <List>
-                        {loading
-                            ? // Skeleton loaders for chats while loading
-                              Array(5)
-                                  .fill(0)
-                                  .map((_, index) => (
-                                      <ListItem key={`skeleton-${index}`} disablePadding>
-                                          <ListItemButton>
-                                              <ListItemAvatar>
-                                                  <Skeleton
-                                                      variant="circular"
-                                                      width={40}
-                                                      height={40}
-                                                  />
-                                              </ListItemAvatar>
-                                              <ListItemText>
-                                                  <Skeleton
-                                                      variant="text"
-                                                      width="80%"
-                                                      height={24}
-                                                  />
-                                              </ListItemText>
-                                          </ListItemButton>
-                                      </ListItem>
-                                  ))
-                            : chats.map((chat) => (
-                                  <ListItem key={chat.id} disablePadding>
-                                      <ListItemButton
-                                          component={Link}
-                                          href={`/messages/${chat.id}`}
-                                      >
-                                          <ListItemAvatar>
-                                              <Avatar src={chat.imageUrl || "/"} alt={chat.name} />
-                                          </ListItemAvatar>
-                                          <ListItemText>{chat.name}</ListItemText>
-                                      </ListItemButton>
-                                  </ListItem>
-                              ))}
-                    </List>
+                    {loading ? (
+                        <List>
+                            {Array(5)
+                                .fill(0)
+                                .map((_, index) => (
+                                    <ListItem key={`skeleton-${index}`} disablePadding>
+                                        <ListItemButton>
+                                            <ListItemAvatar>
+                                                <Skeleton
+                                                    variant="circular"
+                                                    width={40}
+                                                    height={40}
+                                                />
+                                            </ListItemAvatar>
+                                            <ListItemText>
+                                                <Skeleton variant="text" width="80%" height={24} />
+                                            </ListItemText>
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                        </List>
+                    ) : chats.length > 0 ? (
+                        <List>
+                            {chats.map((chat) => (
+                                <ListItem key={chat.id} disablePadding>
+                                    <ListItemButton component={Link} href={`/messages/${chat.id}`}>
+                                        <ListItemAvatar>
+                                            <Avatar src={chat.imageUrl || "/"} alt={chat.name} />
+                                        </ListItemAvatar>
+                                        <ListItemText>{chat.name}</ListItemText>
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    ) : (
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            justifyContent="center"
+                            height="100%"
+                            textAlign="center"
+                            p={3}
+                        >
+                            <Typography variant="h6" gutterBottom>
+                                No Active Chats
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" paragraph>
+                                It looks like you don't have any active chats at the moment. Start a
+                                new conversation to see it listed here.
+                            </Typography>
+                            <Button variant="contained" component={Link} href="/start-chat">
+                                Start a New Chat
+                            </Button>
+                        </Box>
+                    )}
                 </Box>
             </Stack>
             {!isChatPage && <Box flex={{ xs: 0, sm: 1 }} />}
