@@ -3,7 +3,10 @@
 import { prisma } from "@/utils";
 import { auth } from "@clerk/nextjs/server";
 import { put } from "@vercel/blob";
+import { OpenAI, toFile } from "openai";
 
+import axios from "axios";
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export async function uploadCurriculumFile(eventId: string, file: File) {
     const { userId } = await auth();
     if (!userId) throw new Error("Not authenticated");
@@ -46,4 +49,38 @@ export async function updateEventSummary(eventId: string, summary: string) {
     });
 
     return { success: true };
+}
+
+export async function generateSummaryFromUrls(urls: string[]) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const filePromises = urls.map(
+        async (url, index) =>
+            await openai.files.create({
+                file: await fetch(url),
+                purpose: "user_data",
+            })
+    );
+
+    const uploadedFiles = await Promise.all(filePromises);
+
+    const file_content = uploadedFiles.map((file) => {
+        return { type: "input_file" as "input_file", file_id: file.id };
+    });
+
+    const response = await openai.responses.create({
+        model: "gpt-4o",
+        instructions:
+            "Please summarize the following documents comprehensively and clearly. Create a plain text summary that is audio friendly, suitable for being passed to another model for text to speech. Aim for around 3 minutes of talking",
+        input: [
+            {
+                role: "user",
+                content: [...file_content],
+            },
+        ],
+    });
+
+    console.log(response.output_text);
+    return response.output_text;
 }

@@ -4,7 +4,11 @@ import { useParams, useRouter } from "next/navigation";
 import { Box, Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useState, useRef } from "react";
 
-import { updateEventSummary, uploadCurriculumFile } from "@/app/events/summary-setup/actions";
+import {
+    generateSummaryFromUrls,
+    updateEventSummary,
+    uploadCurriculumFile,
+} from "@/app/events/summary-setup/actions";
 
 export default function SummarySetup() {
     const { eventId } = useParams();
@@ -42,7 +46,7 @@ export default function SummarySetup() {
             }
 
             console.log("Uploaded URLs:", curriculumUrls);
-
+            await generateSummaryFromUrls(curriculumUrls);
             // router.push("/events/my-events");
         } catch (err) {
             console.error(err);
