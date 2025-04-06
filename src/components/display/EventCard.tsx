@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card, CardContent, CardActions, Typography, Button, Box, Chip } from "@mui/material";
+import { Card, CardContent, CardActions, Typography, Button, Box, Chip, Grid } from "@mui/material";
 import { joinEvent } from "@/app/events/actions";
 
 export interface Event {
@@ -37,14 +37,69 @@ export default function EventCard({ event }: { event: Event }) {
                         {event.description || "No description provided"}
                     </Typography>
                     <Box sx={{ mt: "auto" }}>
-                        <Typography variant="caption" display="block">
-                            Start: {new Date(event.startTime).toLocaleString()}
-                        </Typography>
-                        {event.endTime && (
-                            <Typography variant="caption" display="block">
-                                End: {new Date(event.endTime).toLocaleString()}
-                            </Typography>
-                        )}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <Typography
+                                    variant="body2"
+                                    component="div"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        flexWrap: "wrap",
+                                        gap: 0.5,
+                                    }}
+                                >
+                                    <Box component="span" fontWeight="bold" color="text.secondary">
+                                        Starts
+                                    </Box>
+                                    {new Date(event.startTime).toLocaleDateString(undefined, {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                    })}
+                                    <Box component="span">•</Box>
+                                    {new Date(event.startTime).toLocaleTimeString(undefined, {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    })}
+                                </Typography>
+                            </Grid>
+
+                            {event.endTime && (
+                                <Grid item xs={12} md={6}>
+                                    <Typography
+                                        variant="body2"
+                                        component="div"
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            flexWrap: "wrap",
+                                            gap: 0.5,
+                                        }}
+                                    >
+                                        <Box
+                                            component="span"
+                                            fontWeight="bold"
+                                            color="text.secondary"
+                                        >
+                                            Ends
+                                        </Box>
+                                        {new Date(event.endTime).toLocaleDateString(undefined, {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                        })}
+                                        <Box component="span">•</Box>
+                                        {new Date(event.endTime).toLocaleTimeString(undefined, {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })}
+                                    </Typography>
+                                </Grid>
+                            )}
+                        </Grid>
                         <Chip
                             label={event.url ? "Online" : "Offline"}
                             color={event.url ? "success" : "default"}
