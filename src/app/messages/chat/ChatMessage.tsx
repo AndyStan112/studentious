@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Paper, Stack, Avatar } from "@mui/material";
+import { Typography, Paper, Stack, Avatar, Link } from "@mui/material";
 import { Message } from "./types";
 import MuiMarkdown from "mui-markdown";
 
@@ -42,7 +42,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userId }) => {
                 }}
             >
                 <Typography component="div" variant="body1">
-                    <MuiMarkdown>{message.message}</MuiMarkdown>
+                    <MuiMarkdown
+                        overrides={{
+                            a: {
+                                component: Link,
+                                props: {
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    underline: "hover",
+                                },
+                            },
+                        }}
+                    >
+                        {message.message}
+                    </MuiMarkdown>
                 </Typography>
                 <Typography variant="caption" color="textSecondary" textAlign="right">
                     {new Date(message.timestamp).toLocaleTimeString([], {

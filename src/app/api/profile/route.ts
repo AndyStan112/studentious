@@ -32,7 +32,6 @@ export async function PUT(request: Request) {
     try {
         const formData = await request.formData();
 
-        // Attempt to upload a new profile image if provided
         let profileImageUrl = "";
         const imageFile = formData.get("profileImage") as File;
         if (imageFile) {
@@ -48,12 +47,10 @@ export async function PUT(request: Request) {
             }
         }
 
-        // Convert the rest of the form data into an object
         const formDataObj = Object.fromEntries(formData.entries());
-        // Remove the file entry since it was already processed
+
         delete formDataObj.profileImage;
 
-        // Convert preferences from comma-separated string to an array (if provided)
         let preferencesArray: string[] = [];
         if (formDataObj.preferences) {
             preferencesArray = formDataObj.preferences
@@ -63,17 +60,13 @@ export async function PUT(request: Request) {
                 .filter(Boolean);
         }
 
-        // Prepare the data to update
         const dataToUpdate: Record<string, any> = {
             name: formDataObj.name,
             preferences: preferencesArray,
         };
-        // Only update the profile image if a new URL was obtained
         if (profileImageUrl) {
             dataToUpdate.profileImage = profileImageUrl;
         }
-
-        // Update the user record in the database
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: dataToUpdate,

@@ -5,6 +5,7 @@ import { useAbly, useChannel } from "ably/react";
 import axios from "axios";
 import {
     Avatar,
+    Box,
     CircularProgress,
     Container,
     Divider,
@@ -23,7 +24,9 @@ import ChatMessage from "./ChatMessage";
 import Link from "next/link";
 import { getChatDetails } from "../actions";
 import theme from "@/theme";
-
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import CloseIcon from "@mui/icons-material/Close";
 interface User {
     id: string;
     name: string;
@@ -39,6 +42,9 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageText, setMessageText] = useState<string>("");
     const [details, setDetails] = useState<any>("");
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
+
     const messageEndRef = useRef<HTMLDivElement | null>(null);
     const ably = useAbly();
 
@@ -93,24 +99,56 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
 
     const sendChatMessage = async () => {
         if (!user || messageText.trim().length === 0) return;
-
-        const newMessage = {
-            message: messageText,
-            senderId: user.id,
-            chatId,
-        };
+        let attachments: any[] = [];
+        setMessageText("");
         try {
-            await axios.post(`/api/chat/${chatId}/messages`, newMessage);
-            console.log(user);
+            if (queuedFiles.length > 0) {
+                await Promise.all(
+                    queuedFiles.slice(0, 6).map(async (file) => {
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        const res = await fetch(`/api/chat/${chatId}/attachments`, {
+                            method: "POST",
+                            body: formData,
+                        });
+                        if (!res.ok) {
+                            //TODO alex fa o notificare frumoasa si baga tipuri
+                            console.log("error uploading file");
+                            return;
+                        }
+                        const data = await res.json();
+                        attachments.push({
+                            name: file.name,
+                            type: data.type,
+                            url: data.url,
+                        });
+                        console.log(attachments);
+                    })
+                );
+                setQueuedFiles([]);
+            }
+            let newMessage = {
+                message: messageText,
+                senderId: user.id,
+                chatId,
+                attachments,
+            };
+            const res = await fetch(`/api/chat/${chatId}/messages`, {
+                method: "POST",
+                body: JSON.stringify({ message: newMessage }),
+            });
+            if (!res.ok) {
+                return;
+            }
+            const data = await res.json();
             const publishMessage = {
                 ...newMessage,
+                message: data["message"] as string,
                 timestamp: Date.now(),
                 sender: { name: user.name, profileImage: user.profileImage },
             };
             const channel = ably.channels.get(`chat-${chatId}`);
             channel.publish("message", publishMessage);
-
-            setMessageText("");
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -177,32 +215,141 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
             </Container>
             <Divider />
             <Container disableGutters>
-                <Toolbar
-                    component="form"
-                    onSubmit={handleFormSubmission}
-                    sx={{ px: 1.5, py: 1, gap: 1 }}
-                    disableGutters
-                >
-                    <TextField
-                        value={messageText}
-                        placeholder="Type a message..."
-                        onChange={(e) => setMessageText(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey) {
-                                e.preventDefault();
-                                sendChatMessage();
-                            }
-                        }}
-                        variant="outlined"
-                        fullWidth
-                        multiline
-                        maxRows={5}
-                        sx={{ flex: 1 }}
-                    />
-                    <Fab type="submit" color="primary" disabled={!messageText.trim()}>
-                        <SendIcon />
-                    </Fab>
-                </Toolbar>
+                <Box position="relative">
+                    {queuedFiles.length > 0 && (
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                            position="absolute"
+                            bottom="100%"
+                            width="100%"
+                            zIndex={10}
+                            p={2}
+                            sx={{
+                                backdropFilter: "blur(12px)",
+                                backgroundColor: "rgba(255, 255, 255, 0.75)",
+                                background: "transparent",
+                                borderRadius: 2,
+                                boxShadow: 3,
+                                overflowX: "auto",
+                            }}
+                        >
+                            {queuedFiles.map((file, index) => (
+                                <Box
+                                    key={index}
+                                    position="relative"
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    sx={{
+                                        border: "1px solid #ccc",
+                                        borderRadius: 2,
+                                        padding: 1,
+                                        maxWidth: 160,
+                                    }}
+                                >
+                                    <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                            setQueuedFiles((files) =>
+                                                files.filter((_, i) => i !== index)
+                                            )
+                                        }
+                                        sx={{
+                                            position: "absolute",
+                                            top: 0,
+                                            right: 0,
+                                            zIndex: 1,
+                                            color: "#333",
+                                        }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+
+                                    {file.type.startsWith("image/") ? (
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt="preview"
+                                            style={{
+                                                maxHeight: 100,
+                                                maxWidth: 120,
+                                                borderRadius: 8,
+                                            }}
+                                        />
+                                    ) : (
+                                        <Stack
+                                            direction="row"
+                                            spacing={1}
+                                            alignItems="center"
+                                            mt={2}
+                                        >
+                                            <InsertDriveFileIcon />
+                                            <Typography variant="body2" noWrap maxWidth={100}>
+                                                {file.name}
+                                            </Typography>
+                                        </Stack>
+                                    )}
+                                </Box>
+                            ))}
+                        </Stack>
+                    )}
+
+                    <Toolbar
+                        component="form"
+                        onSubmit={handleFormSubmission}
+                        sx={{ px: 1.5, py: 1, gap: 1 }}
+                        disableGutters
+                    >
+                        <TextField
+                            value={messageText}
+                            placeholder="Type a message..."
+                            onChange={(e) => setMessageText(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey) {
+                                    e.preventDefault();
+                                    sendChatMessage();
+                                }
+                            }}
+                            variant="outlined"
+                            fullWidth
+                            multiline
+                            maxRows={5}
+                            sx={{ flex: 1 }}
+                        />
+
+                        <input
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt"
+                            hidden
+                            multiple
+                            ref={fileInputRef}
+                            onChange={(e) => {
+                                if (e.target.files) {
+                                    setQueuedFiles([...queuedFiles, ...Array.from(e.target.files)]);
+                                }
+                            }}
+                        />
+
+                        <Fab
+                            size="small"
+                            color="secondary"
+                            onClick={() => fileInputRef.current?.click()}
+                            sx={{ width: 40, height: 40 }}
+                        >
+                            <AttachFileIcon fontSize="small" />
+                        </Fab>
+
+                        <Fab
+                            type="submit"
+                            color="primary"
+                            disabled={!messageText.trim()}
+                            sx={{ width: 40, height: 40 }}
+                        >
+                            <SendIcon fontSize="small" />
+                        </Fab>
+                    </Toolbar>
+                </Box>
             </Container>
         </Stack>
     );
