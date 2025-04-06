@@ -43,8 +43,16 @@ model Event {
   url           String?
   lat           Float?
   long          Float?
+  curriculum    Curriculum[]
+  summary       String         @default("")
+  chat          Chat[]
+}
 
-  chat Chat[]
+model Curriculum {
+  id      String  @id @default(uuid())
+  url     String
+  Event   Event?  @relation(fields: [eventId], references: [id])
+  eventId String?
 }
 
 model Registration {
