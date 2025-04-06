@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container, Typography, Button, Grid, Box } from "@mui/material";
 import { prisma } from "@/utils";
-import EventCard, { Event } from "./EventCard";
+import EventCard, { Event } from "@/components/display/EventCard";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -55,7 +55,7 @@ export default async function EventsPage() {
     const groupedEvents = groupEvents(events);
 
     return (
-        <Container sx={{ mt: 4 }}>
+        <Container sx={{ mt: 5, mb: 5 }}>
             <Typography variant="h4" gutterBottom>
                 Events
             </Typography>
@@ -71,7 +71,7 @@ export default async function EventsPage() {
                 <>
                     {Object.entries(groupedEvents).map(([groupName, eventsInGroup]) =>
                         eventsInGroup.length > 0 ? (
-                            <div key={groupName}>
+                            <Box key={groupName} sx={{ mb: 4 }}>
                                 <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
                                     {groupName}
                                 </Typography>
@@ -82,7 +82,7 @@ export default async function EventsPage() {
                                         </Grid>
                                     ))}
                                 </Grid>
-                            </div>
+                            </Box>
                         ) : null
                     )}
                 </>
