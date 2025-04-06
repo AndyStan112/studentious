@@ -129,8 +129,14 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
         );
 
     return (
-        <Stack flex={3} sx={{ backgroundColor: theme.palette.background.default }}>
-            <Toolbar sx={{ gap: 1, px: 1 }} disableGutters>
+        <Stack
+            flex={3}
+            sx={{
+                //  borderLeft: 1,
+                backgroundColor: theme.palette.background.default,
+            }}
+        >
+            <Toolbar sx={{ gap: 1, ml: 3 }} disableGutters>
                 <Tooltip title="Go back to messages">
                     <IconButton
                         LinkComponent={Link}
@@ -143,10 +149,17 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                 <Avatar src={details.imageUrl} sx={{ width: 36, height: 36 }} />
                 <Typography>{details.name}</Typography>
             </Toolbar>
-            <Divider />
+
             <Container
-                maxWidth="md"
-                sx={{ flex: 1, overflowY: "scroll", overflowX: "hidden" }}
+                sx={{
+                    flex: 1,
+                    overflowY: "scroll",
+                    overflowX: "hidden",
+                    backgroundColor: "#fdfaf6",
+                    // borderRadius: 2,
+                    boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+                    border: "1px solid #e0e0e0",
+                }}
                 disableGutters
             >
                 <Stack
@@ -163,7 +176,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                 </Stack>
             </Container>
             <Divider />
-            <Container maxWidth="md" disableGutters>
+            <Container disableGutters>
                 <Toolbar
                     component="form"
                     onSubmit={handleFormSubmission}

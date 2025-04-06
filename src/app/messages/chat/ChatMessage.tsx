@@ -9,16 +9,19 @@ interface ChatMessageProps {
     groupChat?: boolean;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, userId}) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, userId }) => {
     const isMyself = message.senderId === userId;
 
     return (
         <Stack direction="column" gap={0.5} alignItems={isMyself ? "end" : "start"}>
-            { !isMyself && (
+            {!isMyself && (
                 <Stack direction="row" alignItems="center" gap={0.5}>
-                    <Avatar src={message?.sender?.profileImage||""} sx={{ width: 24, height: 24 }} />
+                    <Avatar
+                        src={message?.sender?.profileImage || ""}
+                        sx={{ width: 24, height: 24 }}
+                    />
                     <Typography variant="body2" fontSize={12} color="textSecondary">
-                        {message?.sender?.name ||""}
+                        {message?.sender?.name || ""}
                     </Typography>
                 </Stack>
             )}
@@ -31,6 +34,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, userId}) => {
                 width="fit-content"
                 overflow="hidden"
                 sx={{
+                    backgroundColor: isMyself ? "#D0E8FF" : undefined,
+                    color: isMyself ? "black" : undefined,
                     "& img": {
                         maxHeight: 200,
                     },

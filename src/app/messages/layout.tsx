@@ -49,7 +49,7 @@ export default function MessagesPage({ children }: { children: React.ReactNode }
                 <Toolbar>
                     <Typography variant="h6">Active Chats</Typography>
                 </Toolbar>
-                <Divider />
+
                 <Box flex={1} sx={{ overflowY: "auto" }}>
                     <List>
                         {chats.map((chat) => (
