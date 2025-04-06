@@ -95,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({
                         <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
                             <Link href="/" style={{ display: "flex", alignItems: "center" }}>
                                 <Image
-                                    src="/icon2.png"
+                                    src="/icon.png"
                                     alt="Studentious logo"
                                     width={40}
                                     height={40}
