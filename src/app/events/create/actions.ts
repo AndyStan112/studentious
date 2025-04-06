@@ -39,7 +39,7 @@ export async function createEvent(body: EventFormData) {
 
     const imageUrl = response.url;
 
-    await prisma.event.create({
+    const createdEvent = await prisma.event.create({
         data: {
             title,
             description,
@@ -55,4 +55,5 @@ export async function createEvent(body: EventFormData) {
             registrations: { create: { userId } },
         },
     });
+    return createdEvent.id;
 }

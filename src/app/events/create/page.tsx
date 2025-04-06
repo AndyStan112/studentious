@@ -109,8 +109,8 @@ export default function EventForm() {
             updatedEventData.long = position[1];
         }
 
-        await createEvent(updatedEventData);
-        router.push("/events");
+        const eventId = await createEvent(updatedEventData);
+        router.push(`/events/summary-setup/${eventId}`);
     };
 
     const triggerImageUpload = () => {
