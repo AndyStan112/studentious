@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Container, Typography, Button, Grid, Box } from "@mui/material";
 import { prisma } from "@/utils";
 import EventCard, { Event } from "@/components/display/EventCard";
+import { auth } from "@clerk/nextjs/server";
+import { recommendEvents } from "@/app/events/actions"; // Adjust path if needed
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -48,9 +50,24 @@ function groupEvents(events: Event[]) {
 }
 
 export default async function EventsPage() {
-    const events: Event[] = await prisma.event.findMany({
+    const { userId } = await auth();
+
+    let events: Event[] = await prisma.event.findMany({
         orderBy: { startTime: "asc" },
+        include: { registrations: true },
     });
+
+    // Mark events as joined if the current user is registered
+    events = events.map((event) => {
+        const joined = event.registrations.some((registration) => registration.userId === userId);
+        return {
+            ...event,
+            joined,
+        };
+    });
+
+    // Fetch recommended events (top 3 matching the user's preferences)
+    const recommendedEvents: Event[] = await recommendEvents();
 
     const groupedEvents = groupEvents(events);
 
@@ -63,6 +80,32 @@ export default async function EventsPage() {
                 Create New Event
             </Button>
 
+            {/* Recommended Events Section */}
+            {recommendedEvents.length > 0 && (
+                <Box
+                    sx={{
+                        p: 3,
+                        mb: 4,
+                        borderRadius: 2,
+                        boxShadow: 1,
+                        bgcolor: "#FFF8E1", // Light golden color
+                        border: "1px solid #FFE082", // Slightly darker golden border
+                    }}
+                >
+                    <Typography variant="h5" gutterBottom align="center" sx={{ color: "#795548" }}>
+                        Recommended For You
+                    </Typography>
+                    <Grid container spacing={2} justifyContent="center">
+                        {recommendedEvents.map((event) => (
+                            <Grid item key={event.id} sx={{ width: 500 }}>
+                                <EventCard event={event} />
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+            )}
+
+            {/* Grouped Events Section */}
             {events.length === 0 ? (
                 <Typography variant="body1">
                     No events found. Please create an event to get started.
@@ -72,10 +115,10 @@ export default async function EventsPage() {
                     {Object.entries(groupedEvents).map(([groupName, eventsInGroup]) =>
                         eventsInGroup.length > 0 ? (
                             <Box key={groupName} sx={{ mb: 4 }}>
-                                <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+                                <Typography variant="h5" sx={{ mt: 4, mb: 2, textAlign: "center" }}>
                                     {groupName}
                                 </Typography>
-                                <Grid container spacing={2}>
+                                <Grid container spacing={2} justifyContent="center">
                                     {eventsInGroup.map((event) => (
                                         <Grid item key={event.id} sx={{ width: 500 }}>
                                             <EventCard event={event} />
