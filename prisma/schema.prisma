@@ -45,7 +45,7 @@ model Event {
   lat           Float?
   long          Float?
   curriculum    Curriculum[]
-  summary       String         @default("")
+  summary       String[]
   chat          Chat[]
 }
 
