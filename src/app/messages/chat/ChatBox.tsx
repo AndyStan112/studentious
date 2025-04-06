@@ -112,6 +112,8 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                     queuedFiles.slice(0, 6).map(async (file) => {
                         const formData = new FormData();
                         formData.append("file", file);
+                        formData.append("upploaderId", user.id);
+
                         const res = await fetch(`/api/chat/${chatId}/attachments`, {
                             method: "POST",
                             body: formData,

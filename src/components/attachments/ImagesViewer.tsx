@@ -20,7 +20,9 @@ export default function ImagesViewer({ chatId }: { chatId: string }) {
             <ImageList cols={3} gap={8}>
                 {images.map((img) => (
                     <ImageListItem key={img.id}>
-                        <img src={img.url} alt="attachment" loading="lazy" />
+                        <a href={img.url} target="_blank" rel="noopener noreferrer">
+                            <img src={img.url} alt="attachment" loading="lazy" />
+                        </a>
                     </ImageListItem>
                 ))}
             </ImageList>

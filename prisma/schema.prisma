@@ -25,7 +25,8 @@ model User {
 
   chats Chat[]
 
-  Messages Messages[]
+  Messages   Messages[]
+  Attachment Attachment[]
 }
 
 model Event {
@@ -87,13 +88,14 @@ model Messages {
 }
 
 model Attachment {
-  id         String         @id @default(uuid())
-  url        String
-  type       AttachmentType
-  uploadedAt DateTime       @default(now())
-
-  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  chatId String
+  id          String         @id @default(uuid())
+  url         String
+  type        AttachmentType
+  uploadedAt  DateTime       @default(now())
+  upploader   User           @relation(fields: [upploaderId], references: [id])
+  chat        Chat           @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId      String
+  upploaderId String
 }
 
 enum AttachmentType {

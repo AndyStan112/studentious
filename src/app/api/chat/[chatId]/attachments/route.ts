@@ -20,6 +20,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
+        const upploaderId = formData.get("upploaderId") as string;
 
         if (!file || !file.type) {
             return NextResponse.json({ error: "Invalid file upload" }, { status: 400 });
@@ -39,6 +40,7 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
                 url: upload.url,
                 type: isImage ? "IMAGE" : "DOCUMENT",
                 chatId,
+                upploaderId,
             },
         });
         console.log(upload.url);
