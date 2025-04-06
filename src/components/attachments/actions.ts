@@ -34,6 +34,13 @@ export async function addCurriculum(chatId: string, url: string) {
         },
     });
 }
+export async function getCurriculumByChat(chatId: string) {
+    const curriculum = await prisma.curriculum.findMany({
+        where: { Event: { chat: { some: { id: chatId } } } },
+    });
+
+    return curriculum;
+}
 
 export async function removeCurriculum(chatId: string, url: string) {
     const chat = await prisma.chat.findUnique({

@@ -1,10 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Button, Stack, Typography, Link as MuiLink } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography, Link as MuiLink } from "@mui/material";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import { getAttachmentsByChatId, addCurriculum } from "./actions";
-import { Attachment, AttachmentType } from "@prisma/client";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import {
+    getAttachmentsByChatId,
+    addCurriculum,
+    removeCurriculumByEvent,
+    removeCurriculum,
+    getCurriculumByChat,
+} from "./actions";
+import { Attachment } from "@prisma/client";
+
+interface Curriculum {
+    id: string;
+    url: string;
+}
 
 interface Props {
     chatId: string;
@@ -14,13 +27,37 @@ interface Props {
 
 export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
     const [docs, setDocs] = useState<Attachment[]>([]);
+    const [curriculumDocs, setCurriculumDocs] = useState<Curriculum[]>([]);
+
+    const isCreator = userId === creatorId;
 
     useEffect(() => {
-        getAttachmentsByChatId(chatId, "DOCUMENT").then(setDocs);
+        const fetchData = async () => {
+            const [attachments, curriculum] = await Promise.all([
+                getAttachmentsByChatId(chatId, "DOCUMENT"),
+                getCurriculumByChat(chatId),
+            ]);
+
+            setDocs(attachments);
+
+            setCurriculumDocs(curriculum);
+        };
+
+        fetchData();
     }, [chatId]);
 
-    const handleAddToCurriculum = async (doc: Attachment) => {
+    const isInCurriculum = (url: string) => {
+        return curriculumDocs.some((c) => c.url === url);
+    };
+
+    const handleAdd = async (doc: Attachment) => {
+        setCurriculumDocs((prev) => [...prev, { id: crypto.randomUUID(), url: doc.url }]);
         await addCurriculum(chatId, doc.url);
+    };
+
+    const handleRemove = async (doc: Attachment) => {
+        setCurriculumDocs((prev) => prev.filter((c) => c.url !== doc.url));
+        await removeCurriculum(chatId, doc.url);
     };
 
     return (
@@ -48,14 +85,23 @@ export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
                                 {doc.url.split("/").pop()}
                             </MuiLink>
                         </Stack>
-                        {userId === creatorId && (
-                            <Button
-                                size="small"
-                                variant="outlined"
-                                onClick={() => handleAddToCurriculum(doc)}
-                            >
-                                Add to Curriculum
-                            </Button>
+
+                        {isCreator && (
+                            <>
+                                {isInCurriculum(doc.url) ? (
+                                    <Tooltip title="Remove from curriculum">
+                                        <IconButton onClick={() => handleRemove(doc)}>
+                                            <RemoveCircleOutlineIcon color="error" />
+                                        </IconButton>
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip title="Add to curriculum">
+                                        <IconButton onClick={() => handleAdd(doc)}>
+                                            <AddCircleOutlineIcon color="primary" />
+                                        </IconButton>
+                                    </Tooltip>
+                                )}
+                            </>
                         )}
                     </Stack>
                 ))}
