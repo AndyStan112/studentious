@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { put } from "@vercel/blob";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +24,7 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
     const { userId } = await auth();
+    const { emailAddresses } = await currentUser();
     if (!userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -66,9 +67,10 @@ export async function PUT(request: Request) {
         if (profileImageUrl) {
             dataToUpdate.profileImage = profileImageUrl;
         }
-        const updatedUser = await prisma.user.update({
+        const updatedUser = await prisma.user.upsert({
             where: { id: userId },
-            data: dataToUpdate,
+            update: dataToUpdate,
+            create: { ...dataToUpdate, id: userId, email: emailAddresses[0].emailAddress },
         });
 
         return NextResponse.json(updatedUser, { status: 200 });
