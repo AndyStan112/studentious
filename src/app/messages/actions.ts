@@ -106,6 +106,7 @@ export async function getChatDetails(chatId: string) {
                 select: {
                     title: true,
                     image: true,
+                    organizerId: true,
                 },
             },
             users: {
@@ -122,12 +123,14 @@ export async function getChatDetails(chatId: string) {
 
     const iseventChat = chat.event !== null;
     const otherUser = chat.users.find((u) => u.id !== userId);
-
+    console.log(chat.event ? chat.event!.organizerId : null);
     return {
         id: chat.id,
         name: iseventChat ? chat.event!.title : otherUser?.name || "Unknown Chat",
         imageUrl: iseventChat
             ? chat.event!.image || "/default_event.png"
             : otherUser?.profileImage || "/default_avatar.png",
+        creatorId: chat.event ? chat.event!.organizerId : null,
+        isEvent: chat.event ? true : false,
     };
 }

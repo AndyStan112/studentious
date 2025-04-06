@@ -27,6 +27,10 @@ import theme from "@/theme";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CloseIcon from "@mui/icons-material/Close";
+import { Drawer, Button } from "@mui/material";
+import ImagesViewer from "@/components/attachments/ImagesViewer";
+import LinksViewer from "@/components/attachments/LinksViewer";
+import DocumentsViewer from "@/components//attachments/DocumentsViewer";
 interface User {
     id: string;
     name: string;
@@ -44,6 +48,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
     const [details, setDetails] = useState<any>("");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
+    const [openDrawer, setOpenDrawer] = useState<null | "IMAGES" | "LINKS" | "DOCUMENTS">(null);
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
     const ably = useAbly();
@@ -184,8 +189,19 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                         <ArrowBackIcon />
                     </IconButton>
                 </Tooltip>
-                <Avatar src={details.imageUrl} sx={{ width: 36, height: 36 }} />
-                <Typography>{details.name}</Typography>
+                <Stack marginLeft="60px" direction="row" alignItems="center" spacing={2}>
+                    <Avatar src={details.imageUrl} sx={{ width: 36, height: 36 }} />
+                    <Typography>{details.name}</Typography>
+                    <Button variant="text" onClick={() => setOpenDrawer("IMAGES")}>
+                        Images
+                    </Button>
+                    <Button variant="text" onClick={() => setOpenDrawer("LINKS")}>
+                        Links
+                    </Button>
+                    <Button variant="text" onClick={() => setOpenDrawer("DOCUMENTS")}>
+                        Documents
+                    </Button>
+                </Stack>
             </Toolbar>
 
             <Container
@@ -351,6 +367,23 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                     </Toolbar>
                 </Box>
             </Container>
+            <Drawer
+                anchor="right"
+                open={!!openDrawer}
+                onClose={() => setOpenDrawer(null)}
+                PaperProps={{ sx: { width: { xs: "100%", md: 480 }, p: 2 } }}
+            >
+                {openDrawer === "IMAGES" && <ImagesViewer chatId={chatId} />}
+                {openDrawer === "LINKS" && <LinksViewer chatId={chatId} />}
+                {openDrawer === "DOCUMENTS" && (
+                    <DocumentsViewer
+                        chatId={chatId}
+                        userId={user.id}
+                        creatorId={details.creatorId}
+                        isEvent={details.isEvent}
+                    />
+                )}
+            </Drawer>
         </Stack>
     );
 }
