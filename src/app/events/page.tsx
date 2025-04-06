@@ -1,17 +1,7 @@
 import Link from "next/link";
-import {
-    Container,
-    Typography,
-    Button,
-    Grid,
-    Card,
-    CardContent,
-    CardActions,
-    Box,
-    Chip,
-} from "@mui/material";
+import { Container, Typography, Button, Grid, Box } from "@mui/material";
 import { prisma } from "@/utils";
-import { joinEvent } from "./actions";
+import EventCard, { Event } from "./EventCard";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -21,7 +11,7 @@ function isSameDay(date1: Date, date2: Date): boolean {
     );
 }
 
-function groupEvents(events: any[]) {
+function groupEvents(events: Event[]) {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
@@ -29,7 +19,7 @@ function groupEvents(events: any[]) {
     const endOfWeek = new Date(today);
     endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 
-    const groups: { [key: string]: any[] } = {
+    const groups: { [key: string]: Event[] } = {
         Today: [],
         Tomorrow: [],
         "This Week": [],
@@ -58,7 +48,7 @@ function groupEvents(events: any[]) {
 }
 
 export default async function EventsPage() {
-    const events = await prisma.event.findMany({
+    const events: Event[] = await prisma.event.findMany({
         orderBy: { startTime: "asc" },
     });
 
@@ -79,106 +69,16 @@ export default async function EventsPage() {
                 </Typography>
             ) : (
                 <>
-                    {Object.entries(groupedEvents).map(([groupName, groupEvents]) =>
-                        groupEvents.length > 0 ? (
+                    {Object.entries(groupedEvents).map(([groupName, eventsInGroup]) =>
+                        eventsInGroup.length > 0 ? (
                             <div key={groupName}>
                                 <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
                                     {groupName}
                                 </Typography>
                                 <Grid container spacing={2}>
-                                    {groupEvents.map((event) => (
-                                        <Grid
-                                            item
-                                            key={event.id}
-                                            sx={{
-                                                width: 500,
-                                            }}
-                                        >
-                                            <Card sx={{ width: "100%" }}>
-                                                <Box display="flex" justifyContent="space-between">
-                                                    <CardContent>
-                                                        <Typography variant="h6">
-                                                            {event.title}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            {event.description ||
-                                                                "No description provided"}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="caption"
-                                                            display="block"
-                                                            sx={{ mt: 1 }}
-                                                        >
-                                                            Start:{" "}
-                                                            {new Date(
-                                                                event.startTime
-                                                            ).toLocaleString()}
-                                                        </Typography>
-                                                        {event.endTime && (
-                                                            <Typography
-                                                                variant="caption"
-                                                                display="block"
-                                                            >
-                                                                End:{" "}
-                                                                {new Date(
-                                                                    event.endTime
-                                                                ).toLocaleString()}
-                                                            </Typography>
-                                                        )}
-                                                        <Chip
-                                                            label={event.url ? "Online" : "Offline"}
-                                                            color={
-                                                                event.url ? "success" : "default"
-                                                            }
-                                                            sx={{ mt: 1 }}
-                                                        />
-                                                    </CardContent>
-                                                    <Box
-                                                        sx={{
-                                                            width: 120,
-                                                            height: 120,
-                                                            m: 2,
-                                                            borderRadius: 2,
-                                                            overflow: "hidden",
-                                                            flexShrink: 0,
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={
-                                                                event.image || "/default_event.png"
-                                                            }
-                                                            alt={event.title}
-                                                            style={{
-                                                                width: "100%",
-                                                                height: "100%",
-                                                                objectFit: "cover",
-                                                            }}
-                                                        />
-                                                    </Box>
-                                                </Box>
-                                                <CardActions>
-                                                    <Button
-                                                        size="small"
-                                                        component={Link}
-                                                        href={`/events/${event.id}`}
-                                                    >
-                                                        View Details
-                                                    </Button>
-                                                    <form
-                                                        action={async () => {
-                                                            "use server";
-                                                            await joinEvent(event.id);
-                                                        }}
-                                                    >
-                                                        <Button type="submit" size="small">
-                                                            Join
-                                                        </Button>
-                                                    </form>
-                                                </CardActions>
-                                            </Card>
+                                    {eventsInGroup.map((event) => (
+                                        <Grid item key={event.id} sx={{ width: 500 }}>
+                                            <EventCard event={event} />
                                         </Grid>
                                     ))}
                                 </Grid>
