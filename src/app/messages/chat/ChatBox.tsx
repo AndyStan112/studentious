@@ -207,9 +207,11 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                     <Button variant="text" onClick={() => setOpenDrawer("DOCUMENTS")}>
                         Documents
                     </Button>
-                    <Button variant="text" onClick={() => setOpenDrawer("CURRICULUM")}>
-                        Curriculum
-                    </Button>
+                    {details.isEvent && (
+                        <Button variant="text" onClick={() => setOpenDrawer("CURRICULUM")}>
+                            Curriculum
+                        </Button>
+                    )}
                 </Stack>
             </Toolbar>
 
