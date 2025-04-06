@@ -62,12 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
             <Box display="flex" justifyContent="center" mt={2} mb={1}>
-                <Image
-                    src="/images/studentious-logo.png"
-                    alt="Studentious logo"
-                    width={48}
-                    height={48}
-                />
+                <Image src="/logo.png" alt="Studentious logo" width={48} height={48} />
             </Box>
             <Typography variant="h6" sx={{ mb: 2 }}>
                 {title}
