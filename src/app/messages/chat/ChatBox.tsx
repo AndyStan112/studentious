@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useAbly, useChannel } from "ably/react";
+import CurriculumViewer from "@/components/attachments/CurriculumViewer";
+
 import axios from "axios";
 import {
     Avatar,
@@ -48,7 +50,9 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
     const [details, setDetails] = useState<any>("");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
-    const [openDrawer, setOpenDrawer] = useState<null | "IMAGES" | "LINKS" | "DOCUMENTS">(null);
+    const [openDrawer, setOpenDrawer] = useState<
+        null | "IMAGES" | "LINKS" | "DOCUMENTS" | "CURRICULUM"
+    >(null);
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
     const ably = useAbly();
@@ -202,6 +206,9 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                     </Button>
                     <Button variant="text" onClick={() => setOpenDrawer("DOCUMENTS")}>
                         Documents
+                    </Button>
+                    <Button variant="text" onClick={() => setOpenDrawer("CURRICULUM")}>
+                        Curriculum
                     </Button>
                 </Stack>
             </Toolbar>
@@ -383,6 +390,13 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                         userId={user.id}
                         creatorId={details.creatorId}
                         isEvent={details.isEvent}
+                    />
+                )}
+                {openDrawer === "CURRICULUM" && details.isEvent && (
+                    <CurriculumViewer
+                        chatId={chatId}
+                        userId={user.id}
+                        creatorId={details.creatorId}
                     />
                 )}
             </Drawer>
