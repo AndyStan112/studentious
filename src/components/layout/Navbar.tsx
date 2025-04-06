@@ -153,9 +153,7 @@ const Navbar: React.FC<NavbarProps> = ({
                                 </Box>
                             )}
                         </Toolbar>
-                        <SignedIn>
-                            <UserButton />
-                        </SignedIn>
+
                         <SignedOut>
                             <SignInButton mode="modal"></SignInButton>
                         </SignedOut>
