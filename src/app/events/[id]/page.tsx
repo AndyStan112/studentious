@@ -7,7 +7,7 @@ import { getEventById } from "./actions";
 import React from "react";
 import { Event, Registration, User } from "@prisma/client";
 
-const EventMap = dynamic(() => import("@/components/EventMap"), {
+const EventMap = dynamic(() => import("@/components/display/EventMap"), {
     ssr: false,
     loading: () => <p>Loading map...</p>,
 });
