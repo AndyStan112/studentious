@@ -38,7 +38,7 @@ export default function SummarySetup() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            if (summaryText.trim()) {
+            if (summaryText.trim() && files.length < 0) {
                 await updateEventSummary(eventId as string, summaryText);
             }
 
@@ -48,8 +48,9 @@ export default function SummarySetup() {
             }
 
             const summary = await generateSummaryFromUrls(curriculumUrls);
+            await updateEventSummary(eventId as string, summary);
             setSummaryText(summary);
-            const audio = await generateAudioFromText(summary);
+            const audio = await generateAudioFromText(eventId as string, summary);
             setAudioUrl(audio);
         } catch (err) {
             console.error(err);
@@ -61,7 +62,7 @@ export default function SummarySetup() {
     return (
         <Container maxWidth="md">
             <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
-                Add Event Summary or Upload Supporting Files
+                Add Event Summary or upload curriculum files to auto-generate
             </Typography>
 
             <Stack spacing={3}>
