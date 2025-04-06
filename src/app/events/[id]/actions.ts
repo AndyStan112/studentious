@@ -11,6 +11,5 @@ export async function getEventById(id: string): Promise<EventWithOrganizer> {
             registrations: true,
         },
     })) as EventWithOrganizer;
-    console.log(event);
     return event!;
 }

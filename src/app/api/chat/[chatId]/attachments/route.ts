@@ -43,7 +43,6 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
                 upploaderId,
             },
         });
-        console.log(upload.url);
         return NextResponse.json(
             {
                 success: true,

@@ -3,7 +3,7 @@ import { Container, Typography, Button, Grid, Box } from "@mui/material";
 import { prisma } from "@/utils";
 import EventCard, { Event } from "@/components/display/EventCard";
 import { auth } from "@clerk/nextjs/server";
-import { recommendEvents } from "@/app/events/actions"; // Adjust path if needed
+import { recommendEvents } from "@/app/events/actions";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -52,21 +52,21 @@ function groupEvents(events: Event[]) {
 export default async function EventsPage() {
     const { userId } = await auth();
 
-    let events: Event[] = await prisma.event.findMany({
+    let events: Event[] = (await prisma.event.findMany({
         orderBy: { startTime: "asc" },
         include: { registrations: true },
-    });
+    })) as any;
 
-    // Mark events as joined if the current user is registered
     events = events.map((event) => {
-        const joined = event.registrations.some((registration) => registration.userId === userId);
+        const joined = event.registrations.some(
+            (registration: { userId: string | null }) => registration.userId === userId
+        );
         return {
             ...event,
             joined,
         };
     });
 
-    // Fetch recommended events (top 3 matching the user's preferences)
     const recommendedEvents: Event[] = await recommendEvents();
 
     const groupedEvents = groupEvents(events);
@@ -80,7 +80,6 @@ export default async function EventsPage() {
                 Create New Event
             </Button>
 
-            {/* Recommended Events Section */}
             {recommendedEvents.length > 0 && (
                 <Box
                     sx={{
@@ -88,8 +87,8 @@ export default async function EventsPage() {
                         mb: 4,
                         borderRadius: 2,
                         boxShadow: 1,
-                        bgcolor: "#FFF8E1", // Light golden color
-                        border: "1px solid #FFE082", // Slightly darker golden border
+                        bgcolor: "#FFF8E1",
+                        border: "1px solid #FFE082",
                     }}
                 >
                     <Typography variant="h5" gutterBottom align="center" sx={{ color: "#795548" }}>
@@ -105,7 +104,6 @@ export default async function EventsPage() {
                 </Box>
             )}
 
-            {/* Grouped Events Section */}
             {events.length === 0 ? (
                 <Typography variant="body1">
                     No events found. Please create an event to get started.

@@ -10,7 +10,6 @@ function generateMapLink(lat?: number | null, long?: number | null): string {
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id } = await params;
-    console.log(id);
     const event = await prisma.event.findUnique({
         where: { id },
     });

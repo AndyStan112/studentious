@@ -79,8 +79,6 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
             try {
                 const response = await axios.get(`/api/chat/${chatId}/messages`);
                 setMessages(response.data);
-                console.log("=====================================");
-                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
@@ -97,7 +95,6 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
         const fetchDetails = async () => {
             try {
                 const response = await getChatDetails(chatId);
-                console.log(response);
                 setDetails(response);
             } catch (error) {
                 console.error("Error fetching messages:", error);
@@ -123,8 +120,7 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                             body: formData,
                         });
                         if (!res.ok) {
-                            //TODO alex fa o notificare frumoasa si baga tipuri
-                            console.log("error uploading file");
+                            console.error("error uploading file");
                             return;
                         }
                         const data = await res.json();
@@ -133,7 +129,6 @@ export default function ChatBox({ chatId }: ChatBoxProps) {
                             type: data.type,
                             url: data.url,
                         });
-                        console.log(attachments);
                     })
                 );
                 setQueuedFiles([]);

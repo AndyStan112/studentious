@@ -22,7 +22,6 @@ export default function UploadAttachment({ chatId }: { chatId: string }) {
                 body: formData,
             });
             const result = await res.json();
-            console.log("Uploaded:", result);
         } catch (err) {
             console.error("Upload failed", err);
         } finally {

@@ -80,7 +80,6 @@ export async function getChats() {
     });
 
     if (!user) return [];
-    console.log(user.chats);
     return user.chats.map((chat) => {
         const isEventChat = chat.event !== null;
         const otherUser = chat.users.find((u) => u.id !== userId);
@@ -123,7 +122,6 @@ export async function getChatDetails(chatId: string) {
 
     const iseventChat = chat.event !== null;
     const otherUser = chat.users.find((u) => u.id !== userId);
-    console.log(chat.event ? chat.event!.organizerId : null);
     return {
         id: chat.id,
         name: iseventChat ? chat.event!.title : otherUser?.name || "Unknown Chat",

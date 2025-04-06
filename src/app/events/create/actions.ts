@@ -18,7 +18,6 @@ export async function createEvent(body: EventFormData) {
         (eventType === "offline" && (!lat || !long)) ||
         (eventType === "online" && !url)
     ) {
-        console.log(startTime);
         throw new Error("Missing or invalid required fields");
     }
 

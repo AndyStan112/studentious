@@ -81,7 +81,6 @@ export async function generateSummaryFromUrls(urls: string[]) {
         ],
     });
 
-    console.log(response.output_text);
     return response.output_text;
 }
 export async function generateAudioFromText(text: string) {

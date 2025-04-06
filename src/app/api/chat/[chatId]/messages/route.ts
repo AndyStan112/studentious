@@ -5,7 +5,6 @@ import { put } from "@vercel/blob";
 
 export async function GET(req: Request, context: { params: { chatId?: string } }) {
     const { chatId } = await context.params;
-    console.log(chatId);
     if (!chatId) {
         return NextResponse.json({ error: "Chat ID is required" }, { status: 400 });
     }
@@ -16,7 +15,6 @@ export async function GET(req: Request, context: { params: { chatId?: string } }
             include: { sender: { select: { name: true, profileImage: true } } },
             orderBy: { timestamp: "asc" },
         });
-        // console.log(messages);
         return NextResponse.json(messages, { status: 200 });
     } catch (error) {
         console.error("Error fetching messages:", error);
@@ -33,7 +31,6 @@ export async function POST(req: Request, context: { params: { chatId?: string } 
 
     try {
         const { message } = await req.json();
-        console.log(message);
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         const urls = message.message.match(urlRegex);
 

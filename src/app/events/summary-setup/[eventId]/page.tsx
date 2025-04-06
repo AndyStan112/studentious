@@ -2,7 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { Box, Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useState, useRef } from "react";
-import { generateAudioFromText } from "@/app/events/summary-setup/actions"; // add this import
+import { generateAudioFromText } from "@/app/events/summary-setup/actions";
 
 import {
     generateSummaryFromUrls,
@@ -33,7 +33,7 @@ export default function SummarySetup() {
         }
     };
 
-    const [audioUrl, setAudioUrl] = useState<string | null>(null); // new state
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -46,8 +46,6 @@ export default function SummarySetup() {
             if (files.length > 0) {
                 curriculumUrls = await uploadAllFiles(eventId as string, files);
             }
-
-            console.log("Uploaded URLs:", curriculumUrls);
 
             const summary = await generateSummaryFromUrls(curriculumUrls);
             setSummaryText(summary);

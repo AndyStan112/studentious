@@ -3,6 +3,7 @@ import { Card, CardContent, CardActions, Typography, Button, Box, Chip } from "@
 import { joinEvent } from "@/app/events/actions";
 
 export interface Event {
+    registrations: any;
     id: string;
     title: string;
     description?: string;
@@ -10,7 +11,7 @@ export interface Event {
     endTime?: string;
     url?: string;
     image?: string;
-    joined?: boolean; // indicates if the current user has joined the event
+    joined?: boolean;
 }
 
 export default function EventCard({ event }: { event: Event }) {

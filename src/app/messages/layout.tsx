@@ -26,7 +26,6 @@ export default function MessagesPage({ children }: { children: React.ReactNode }
     useEffect(() => {
         const fetchChats = async () => {
             const chats = await getChats();
-            console.log(chats);
             setChats(chats);
         };
         fetchChats();
