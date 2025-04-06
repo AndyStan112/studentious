@@ -8,11 +8,10 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import {
     getAttachmentsByChatId,
     addCurriculum,
-    removeCurriculumByEvent,
     removeCurriculum,
     getCurriculumByChat,
+    AttachmentWithUpploader,
 } from "./actions";
-import { Attachment } from "@prisma/client";
 
 interface Curriculum {
     id: string;
@@ -26,7 +25,8 @@ interface Props {
 }
 
 export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
-    const [docs, setDocs] = useState<Attachment[]>([]);
+    const [docs, setDocs] = useState<AttachmentWithUpploader[]>([]);
+
     const [curriculumDocs, setCurriculumDocs] = useState<Curriculum[]>([]);
 
     const isCreator = userId === creatorId;
@@ -50,7 +50,7 @@ export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
         return curriculumDocs.some((c) => c.url === url);
     };
 
-    const handleAdd = async (doc: Attachment) => {
+    const handleAdd = async (doc: AttachmentWithUpploader) => {
         const addedCurriculum = await addCurriculum(chatId, doc.url);
         setCurriculumDocs((prev) => [
             ...prev,
@@ -58,7 +58,7 @@ export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
         ]);
     };
 
-    const handleRemove = async (doc: Attachment) => {
+    const handleRemove = async (doc: AttachmentWithUpploader) => {
         setCurriculumDocs((prev) => prev.filter((c) => c.url !== doc.url));
         await removeCurriculum(chatId, doc.url);
     };
@@ -77,16 +77,23 @@ export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
                         alignItems="center"
                         justifyContent="space-between"
                     >
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <InsertDriveFileIcon />
-                            <MuiLink
-                                href={doc.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                underline="hover"
-                            >
-                                {doc.url.split("/").pop()}
-                            </MuiLink>
+                        <Stack direction="column">
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <InsertDriveFileIcon />
+                                <MuiLink
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    underline="hover"
+                                >
+                                    {doc.url.split("/").pop()}
+                                </MuiLink>
+                            </Stack>
+
+                            <Typography variant="caption" color="text.secondary">
+                                Uploaded by {doc.upploader.name || doc.upploader.email} on{" "}
+                                {new Date(doc.uploadedAt).toLocaleString()}
+                            </Typography>
                         </Stack>
 
                         {isCreator && (

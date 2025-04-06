@@ -1,13 +1,28 @@
 "use server";
 
 import { prisma } from "@/utils";
-import { AttachmentType } from "@prisma/client";
+import { Attachment, AttachmentType } from "@prisma/client";
+
+export interface AttachmentWithUpploader extends Attachment {
+    upploader: {
+        name: string | null;
+        email: string;
+    };
+}
 
 export async function getAttachmentsByChatId(chatId: string, type: AttachmentType) {
     return prisma.attachment.findMany({
         where: {
             chatId,
             type,
+        },
+        include: {
+            upploader: {
+                select: {
+                    name: true,
+                    email: true,
+                },
+            },
         },
         orderBy: {
             uploadedAt: "desc",
