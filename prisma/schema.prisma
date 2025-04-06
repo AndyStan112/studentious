@@ -59,11 +59,13 @@ model Registration {
 }
 
 model Chat {
-  id       String     @id @default(uuid())
-  event    Event?     @relation(fields: [eventId], references: [id])
-  users    User[]
-  messages Messages[]
-  eventId  String?    @unique
+  id      String  @id @default(uuid())
+  event   Event?  @relation(fields: [eventId], references: [id])
+  eventId String? @unique
+
+  users       User[]
+  messages    Messages[]
+  attachments Attachment[]
 }
 
 model Messages {
@@ -74,4 +76,20 @@ model Messages {
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   chatId    String
   timestamp DateTime @default(now())
+}
+
+model Attachment {
+  id         String         @id @default(uuid())
+  url        String
+  type       AttachmentType
+  uploadedAt DateTime       @default(now())
+
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId String
+}
+
+enum AttachmentType {
+  IMAGE
+  DOCUMENT
+  LINK
 }
