@@ -26,6 +26,11 @@ export async function addCurriculum(chatId: string, url: string) {
     }
 
     const eventId = chat.event.id;
+    const exists = await prisma.curriculum.findFirst({
+        where: { url, eventId },
+    });
+
+    if (exists) return exists;
 
     return prisma.curriculum.create({
         data: {
