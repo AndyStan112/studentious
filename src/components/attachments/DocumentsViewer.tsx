@@ -1,33 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography, Link as MuiLink } from "@mui/material";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import { getAttachmentsByChatId } from "./actions";
+import { getAttachmentsByChatId, addCurriculum } from "./actions";
 import { Attachment, AttachmentType } from "@prisma/client";
 
 interface Props {
     chatId: string;
     userId: string;
     creatorId: string;
-    isEvent: boolean;
 }
 
-export default function DocumentsViewer({ chatId, userId, creatorId, isEvent }: Props) {
+export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
     const [docs, setDocs] = useState<Attachment[]>([]);
 
     useEffect(() => {
-        getAttachmentsByChatId(chatId, "DOCUMENT").then((d) => setDocs(d));
-        console.log(userId);
-        console.log(creatorId);
-        console.log(isEvent);
+        getAttachmentsByChatId(chatId, "DOCUMENT").then(setDocs);
     }, [chatId]);
 
     const handleAddToCurriculum = async (doc: Attachment) => {
-        await fetch("/api/curriculum/add", {
-            method: "POST",
-            body: JSON.stringify({ chatId, documentUrl: doc.url }),
-        });
+        await addCurriculum(chatId, doc.url);
     };
 
     return (
@@ -46,9 +39,16 @@ export default function DocumentsViewer({ chatId, userId, creatorId, isEvent }: 
                     >
                         <Stack direction="row" spacing={1} alignItems="center">
                             <InsertDriveFileIcon />
-                            <Typography>{doc.url.split("/").pop()}</Typography>
+                            <MuiLink
+                                href={doc.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                underline="hover"
+                            >
+                                {doc.url.split("/").pop()}
+                            </MuiLink>
                         </Stack>
-                        {userId === creatorId && isEvent && (
+                        {userId === creatorId && (
                             <Button
                                 size="small"
                                 variant="outlined"
