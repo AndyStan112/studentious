@@ -45,8 +45,16 @@ model Event {
   lat           Float?
   long          Float?
   curriculum    Curriculum[]
-  summary       String[]
+  summaries     Summary[]
   chat          Chat[]
+}
+
+model Summary {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  Event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
 }
 
 model Curriculum {
