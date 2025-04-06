@@ -10,6 +10,7 @@ export interface Event {
     endTime?: string;
     url?: string;
     image?: string;
+    joined?: boolean; // indicates if the current user has joined the event
 }
 
 export default function EventCard({ event }: { event: Event }) {
@@ -57,6 +58,9 @@ export default function EventCard({ event }: { event: Event }) {
                 </Box>
             </Box>
             <CardActions>
+                <Button size="small" component={Link} href={`/events/${event.id}`}>
+                    View Details
+                </Button>
                 <form
                     action={async () => {
                         "use server";
@@ -66,20 +70,18 @@ export default function EventCard({ event }: { event: Event }) {
                     <Button
                         type="submit"
                         size="small"
+                        disabled={event.joined}
                         sx={{
-                            backgroundColor: "primary.light",
+                            backgroundColor: event.joined ? "grey.500" : "primary.main",
                             color: "white",
                             "&:hover": {
-                                backgroundColor: "primary.main",
+                                backgroundColor: event.joined ? "grey.700" : "primary.dark",
                             },
                         }}
                     >
-                        Join
+                        {event.joined ? "Joined" : "Join"}
                     </Button>
                 </form>
-                <Button size="small" component={Link} href={`/events/${event.id}`}>
-                    View Details
-                </Button>
             </CardActions>
         </Card>
     );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container, Typography, Button, Grid, Box } from "@mui/material";
 import { prisma } from "@/utils";
 import EventCard, { Event } from "@/components/display/EventCard";
+import { auth } from "@clerk/nextjs/server";
 
 function isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -48,8 +49,18 @@ function groupEvents(events: Event[]) {
 }
 
 export default async function EventsPage() {
-    const events: Event[] = await prisma.event.findMany({
+    const { userId } = await auth();
+    let events: Event[] = await prisma.event.findMany({
         orderBy: { startTime: "asc" },
+        include: { registrations: true },
+    });
+
+    events = events.map((event) => {
+        const joined = event.registrations.some((registration) => registration.userId === userId);
+        return {
+            ...event,
+            joined,
+        };
     });
 
     const groupedEvents = groupEvents(events);
@@ -78,7 +89,7 @@ export default async function EventsPage() {
                                 <Grid container spacing={2}>
                                     {eventsInGroup.map((event) => (
                                         <Grid item key={event.id} sx={{ width: 500 }}>
-                                            <EventCard event={event} />
+                                            <EventCard event={{ ...event }} />
                                         </Grid>
                                     ))}
                                 </Grid>
