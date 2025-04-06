@@ -12,6 +12,7 @@ import {
     Stack,
     Toolbar,
     Typography,
+    Skeleton,
 } from "@mui/material";
 import { getChats } from "./actions";
 import Link from "next/link";
@@ -22,11 +23,19 @@ export default function MessagesPage({ children }: { children: React.ReactNode }
     const isChatPage = /^\/messages\/.+/.test(pathname);
 
     const [chats, setChats] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchChats = async () => {
-            const chats = await getChats();
-            setChats(chats);
+            setLoading(true);
+            try {
+                const chats = await getChats();
+                setChats(chats);
+            } catch (error) {
+                console.error("Error fetching chats:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchChats();
     }, []);
@@ -51,16 +60,43 @@ export default function MessagesPage({ children }: { children: React.ReactNode }
 
                 <Box flex={1} sx={{ overflowY: "auto" }}>
                     <List>
-                        {chats.map((chat) => (
-                            <ListItem key={chat.id} disablePadding>
-                                <ListItemButton component={Link} href={`/messages/${chat.id}`}>
-                                    <ListItemAvatar>
-                                        <Avatar src={chat.imageUrl || "/"} alt={chat.name} />
-                                    </ListItemAvatar>
-                                    <ListItemText>{chat.name}</ListItemText>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                        {loading
+                            ? // Skeleton loaders for chats while loading
+                              Array(5)
+                                  .fill(0)
+                                  .map((_, index) => (
+                                      <ListItem key={`skeleton-${index}`} disablePadding>
+                                          <ListItemButton>
+                                              <ListItemAvatar>
+                                                  <Skeleton
+                                                      variant="circular"
+                                                      width={40}
+                                                      height={40}
+                                                  />
+                                              </ListItemAvatar>
+                                              <ListItemText>
+                                                  <Skeleton
+                                                      variant="text"
+                                                      width="80%"
+                                                      height={24}
+                                                  />
+                                              </ListItemText>
+                                          </ListItemButton>
+                                      </ListItem>
+                                  ))
+                            : chats.map((chat) => (
+                                  <ListItem key={chat.id} disablePadding>
+                                      <ListItemButton
+                                          component={Link}
+                                          href={`/messages/${chat.id}`}
+                                      >
+                                          <ListItemAvatar>
+                                              <Avatar src={chat.imageUrl || "/"} alt={chat.name} />
+                                          </ListItemAvatar>
+                                          <ListItemText>{chat.name}</ListItemText>
+                                      </ListItemButton>
+                                  </ListItem>
+                              ))}
                     </List>
                 </Box>
             </Stack>
