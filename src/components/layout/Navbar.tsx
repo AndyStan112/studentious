@@ -21,6 +21,7 @@ import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 interface NavbarProps {
     title?: string;
@@ -33,7 +34,6 @@ interface NavbarProps {
 function HideOnScroll(props: { children: React.ReactElement }) {
     const { children } = props;
     const trigger = useScrollTrigger();
-
     return (
         <Slide appear={false} direction="down" in={!trigger}>
             {children}
@@ -52,17 +52,24 @@ const Navbar: React.FC<NavbarProps> = ({
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [drawerOpen, setDrawerOpen] = useState(false);
     const pathname = usePathname();
+
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);
     };
 
-    const isActive = (path: string) => {
-        return pathname === path;
-    };
+    const isActive = (path: string) => pathname === path;
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-            <Typography variant="h6" sx={{ my: 2 }}>
+            <Box display="flex" justifyContent="center" mt={2} mb={1}>
+                <Image
+                    src="/images/studentious-logo.png"
+                    alt="Studentious logo"
+                    width={48}
+                    height={48}
+                />
+            </Box>
+            <Typography variant="h6" sx={{ mb: 2 }}>
                 {title}
             </Typography>
             <List>
@@ -88,34 +95,35 @@ const Navbar: React.FC<NavbarProps> = ({
     return (
         <>
             <HideOnScroll>
-                <AppBar
-                    position="sticky"
-                    color="default"
-                    elevation={1}
-                    sx={{ backgroundColor: "background.paper" }}
-                >
+                <AppBar position="sticky" color="default" elevation={1}>
                     <Container maxWidth="xl">
-                        <Toolbar disableGutters>
-                            <Typography
-                                variant="h6"
-                                noWrap
-                                component="div"
-                                sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
-                            >
-                                {title}
-                            </Typography>
+                        <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
+                            <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+                                <Image
+                                    src="/icon2.png"
+                                    alt="Studentious logo"
+                                    width={40}
+                                    height={40}
+                                />
+                                <Typography
+                                    variant="h6"
+                                    noWrap
+                                    component="div"
+                                    sx={{ ml: 1, color: "text.primary" }}
+                                >
+                                    {title}
+                                </Typography>
+                            </Link>
 
                             {isMobile ? (
-                                <>
-                                    <IconButton
-                                        color="inherit"
-                                        aria-label="open drawer"
-                                        edge="start"
-                                        onClick={handleDrawerToggle}
-                                    >
-                                        <MenuIcon />
-                                    </IconButton>
-                                </>
+                                <IconButton
+                                    color="inherit"
+                                    aria-label="open drawer"
+                                    edge="end"
+                                    onClick={handleDrawerToggle}
+                                >
+                                    <MenuIcon />
+                                </IconButton>
                             ) : (
                                 <Box sx={{ display: "flex" }}>
                                     {links.map((link) => (
@@ -125,17 +133,18 @@ const Navbar: React.FC<NavbarProps> = ({
                                                     mx: 1,
                                                     color: isActive(link.path)
                                                         ? "primary.main"
-                                                        : "inherit",
+                                                        : "text.primary",
                                                     position: "relative",
                                                     "&::after": isActive(link.path)
                                                         ? {
                                                               content: '""',
                                                               position: "absolute",
-                                                              bottom: "0",
-                                                              left: "0",
+                                                              bottom: 0,
+                                                              left: 0,
                                                               width: "100%",
                                                               height: "3px",
-                                                              backgroundColor: "primary.main",
+                                                              backgroundColor:
+                                                                  theme.palette.primary.main,
                                                               borderRadius: "2px",
                                                           }
                                                         : {},
@@ -156,9 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 anchor="right"
                 open={drawerOpen}
                 onClose={handleDrawerToggle}
-                ModalProps={{
-                    keepMounted: true,
-                }}
+                ModalProps={{ keepMounted: true }}
                 sx={{
                     display: { xs: "block", md: "none" },
                     "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
