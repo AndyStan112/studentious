@@ -51,8 +51,11 @@ export default function DocumentsViewer({ chatId, userId, creatorId }: Props) {
     };
 
     const handleAdd = async (doc: Attachment) => {
-        setCurriculumDocs((prev) => [...prev, { id: crypto.randomUUID(), url: doc.url }]);
-        await addCurriculum(chatId, doc.url);
+        const addedCurriculum = await addCurriculum(chatId, doc.url);
+        setCurriculumDocs((prev) => [
+            ...prev,
+            { id: addedCurriculum.id, url: addedCurriculum.url },
+        ]);
     };
 
     const handleRemove = async (doc: Attachment) => {
