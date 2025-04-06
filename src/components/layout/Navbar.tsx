@@ -22,6 +22,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { SignedIn, SignedOut, SignIn, SignInButton, UserButton } from "@clerk/nextjs";
 
 interface NavbarProps {
     title?: string;
@@ -152,6 +153,12 @@ const Navbar: React.FC<NavbarProps> = ({
                                 </Box>
                             )}
                         </Toolbar>
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
+                        <SignedOut>
+                            <SignInButton mode="modal"></SignInButton>
+                        </SignedOut>
                     </Container>
                 </AppBar>
             </HideOnScroll>
