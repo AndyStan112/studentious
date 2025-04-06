@@ -46,6 +46,7 @@ model Event {
   long          Float?
   curriculum    Curriculum[]
   summary       String         @default("")
+  podcast       String         @default("")
   chat          Chat[]
 }
 
