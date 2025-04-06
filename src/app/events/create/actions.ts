@@ -52,6 +52,7 @@ export async function createEvent(body: EventFormData) {
             lat: eventType === "offline" ? lat : undefined,
             long: eventType === "offline" ? long : undefined,
             chat: { create: { users: { connect: { id: userId } } } },
+            registrations: { create: { userId } },
         },
     });
 }
