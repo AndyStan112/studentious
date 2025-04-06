@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import {
     Container,
@@ -12,7 +12,9 @@ import {
     Stack,
     CircularProgress,
     Avatar,
+    Divider,
 } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 interface ProfileData {
     name: string;
@@ -21,7 +23,8 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
-    const { isLoaded, isSignedIn } = useUser();
+    const { isLoaded, isSignedIn, user } = useUser();
+    const { signOut } = useClerk();
     const router = useRouter();
     const [profileData, setProfileData] = useState<ProfileData>({
         name: "",
@@ -100,6 +103,11 @@ export default function ProfilePage() {
         }
     };
 
+    const handleLogout = async () => {
+        await signOut();
+        router.push("/"); // Redirect to homepage after logout
+    };
+
     if (!isLoaded || loading) {
         return (
             <Container sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
@@ -119,13 +127,34 @@ export default function ProfilePage() {
     return (
         <Container sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Paper elevation={3} sx={{ p: 4, maxWidth: 500, width: "100%" }}>
-                <Typography variant="h5" gutterBottom>
-                    Profile Settings
-                </Typography>
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ mb: 2 }}
+                >
+                    <Typography variant="h5" gutterBottom sx={{ mb: 0 }}>
+                        Profile Settings
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<LogoutIcon />}
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </Button>
+                </Stack>
+
+                <Divider sx={{ mb: 3 }} />
+
                 <form onSubmit={handleSubmit} noValidate>
                     <Stack spacing={2}>
                         <Stack direction="row" spacing={2} alignItems="center">
-                            <Avatar src={profileData.profileImage} sx={{ width: 80, height: 80 }} />
+                            <Avatar
+                                src={profileData.profileImage || user?.imageUrl}
+                                sx={{ width: 80, height: 80 }}
+                            />
                             <Button variant="contained" component="label">
                                 Change Picture
                                 <input
