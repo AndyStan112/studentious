@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { getEventById } from "./actions";
 import React from "react";
 import { Event, Registration, User } from "@prisma/client";
+import MuiMarkdown from "mui-markdown";
 
 const EventMap = dynamic(() => import("@/components/display/EventMap"), {
     ssr: false,
@@ -131,7 +132,6 @@ export default function EventDetailPage({ params }: PageProps) {
                     </Box>
                 </Box>
 
-                {/* Image - Will appear after text on mobile */}
                 <Box
                     sx={{
                         width: { xs: "100%", md: 360 },
@@ -154,7 +154,6 @@ export default function EventDetailPage({ params }: PageProps) {
                 </Box>
             </Box>
 
-            {/* Location/URL Section */}
             {event.url ? (
                 <Box sx={{ my: 2, width: "100%", maxWidth: "md", mx: "auto" }}>
                     <Typography variant="subtitle1">
@@ -177,6 +176,26 @@ export default function EventDetailPage({ params }: PageProps) {
                     <Box sx={{ height: 400, width: "100%" }}>
                         <EventMap lat={event.lat} long={event.long} />
                     </Box>
+                </Box>
+            )}
+            {event.summary && (
+                <Box sx={{ my: 4, maxWidth: "md", mx: "auto" }}>
+                    <Typography variant="h6" gutterBottom>
+                        Summary
+                    </Typography>
+                    <MuiMarkdown>{event.summary}</MuiMarkdown>
+                </Box>
+            )}
+
+            {event.podcast && (
+                <Box sx={{ my: 4, maxWidth: "md", mx: "auto" }}>
+                    <Typography variant="h6" gutterBottom>
+                        Podcast
+                    </Typography>
+                    <audio controls style={{ width: "100%" }}>
+                        <source src={event.podcast} type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                    </audio>
                 </Box>
             )}
         </Container>

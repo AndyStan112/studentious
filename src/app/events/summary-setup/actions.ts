@@ -83,7 +83,7 @@ export async function generateSummaryFromUrls(urls: string[]) {
 
     return response.output_text;
 }
-export async function generateAudioFromText(text: string) {
+export async function generateAudioFromText(eventId: string, text: string) {
     const { userId } = await auth();
     if (!userId) throw new Error("Not authenticated");
 
@@ -98,6 +98,11 @@ export async function generateAudioFromText(text: string) {
 
     const file = new File([audioBlob], "summary.mp3", { type: "audio/mpeg" });
     const uploaded = await put("summary.mp3", file, { access: "public" });
+
+    await prisma.event.update({
+        where: { id: eventId },
+        data: { podcast: uploaded.url },
+    });
 
     return uploaded.url;
 }
