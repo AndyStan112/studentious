@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card, CardContent, CardActions, Typography, Button, Box, Chip } from "@mui/material";
-import { joinEvent } from "../../app/events/actions";
+import { joinEvent } from "@/app/events/actions";
 
 export interface Event {
     id: string;
@@ -57,19 +57,29 @@ export default function EventCard({ event }: { event: Event }) {
                 </Box>
             </Box>
             <CardActions>
-                <Button size="small" component={Link} href={`/events/${event.id}`}>
-                    View Details
-                </Button>
                 <form
                     action={async () => {
                         "use server";
                         await joinEvent(event.id);
                     }}
                 >
-                    <Button type="submit" size="small">
+                    <Button
+                        type="submit"
+                        size="small"
+                        sx={{
+                            backgroundColor: "primary.light",
+                            color: "white",
+                            "&:hover": {
+                                backgroundColor: "primary.main",
+                            },
+                        }}
+                    >
                         Join
                     </Button>
                 </form>
+                <Button size="small" component={Link} href={`/events/${event.id}`}>
+                    View Details
+                </Button>
             </CardActions>
         </Card>
     );
